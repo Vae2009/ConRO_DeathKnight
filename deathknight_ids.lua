@@ -28,39 +28,47 @@ local ConRO_DeathKnight, ids = ...;
 --Blood
 	ids.Blood_Ability = {
 	--Death Knight
-		Acclimation = {spellID = 373926, talentID = 96175},
-		AntiMagicBarrier = {spellID = 205727, talentID = 96174},
-		Assimilation = {spellID = 374383, talentID = 96176},
-		BloodDraw = {spellID = 374598, talentID = 96208},
-		BloodScent = {spellID = 374030, talentID = 96195},
-		Brittle = {spellID = 374504, talentID = 96190},
-		CleavingStrikes = {spellID = 316916, talentID = 96202},
-		ClenchingGrasp = {spellID = 389679, talentID = 96191},
-		Coldthirst = {spellID = 378848, talentID = 96173},
-		DeathsEcho = {spellID = 356367, talentID = 96184},
-		DeathsReach = {spellID = 276079, talentID = 96186},
-		Enfeeble = {spellID = 392566, talentID = 96189},
-		GloomWard = {spellID = 391571, talentID = 96180},
-		GripoftheDead = {spellID = 273952, talentID = 96185},
-		IcyTalons = {spellID = 194878, talentID = 96179},
-		ImprovedDeathStrike = {spellID = 374277, talentID = 96196},
-		InsidiousChill = {spellID = 391566, talentID = 96217},
-		MarchofDarkness = {spellID = 391546, talentID = 96198},
-		MercilessStrikes = {spellID = 373923, talentID = 96214},
-		MightofThassarian = {spellID = 374111, talentID = 96205},
-		OnaPaleHorse = {spellID = 51986},
-		Permafrost = {spellID = 207200, talentID = 96212},
-		ProliferatingChill = {spellID = 373930, talentID = 96215},
-		RuneMastery = {spellID = 374574, talentID = 96209},
-		RunicAttenuation = {spellID = 207104, talentID = 207104},
-		Suppression = {spellID = 374049, talentID = 96204},
-		UnholyBond = {spellID = 374261, talentID = 96183},
-		UnholyEndurance = {spellID = 389682, talentID = 96192},
-		UnholyGround = {spellID = 374265, talentID = 96187},
-		VeteranoftheThirdWar = {spellID = 48263, talentID = 96197},
-		WilloftheNecropolis = {spellID = 206967, talentID = 96182},
+		AbominationLimb = {spellID = 383269, talentID = 96177},
+		AntiMagicShell = {spellID = 48707, talentID = 96199},
+		AntiMagicZone = {spellID = 51052, talentID = 96194},
+		Asphyxiate = {spellID = 221562, talentID = 96193},
+		BlindingSleet = {spellID = 207167, talentID = 96172},
+		ChainsofIce = {spellID = 45524, talentID = 96210},
+		ControlUndead = {spellID = 111673, talentID = 96188},
+		DarkCommand = {spellID = 56222},
+		DeathandDecay = {spellID = 43265},
+		DeathCoil = {spellID = 47541},
+		DeathGate = {spellID = 50977},
+		DeathGrip = {spellID = 49576},
+		DeathStrike = {spellID = 49998, talentID = 96200},
+		DeathPact = {spellID = 48743, talentID = 96206},
+		DeathsAdvance = {spellID = 48265},
+		EmpowerRuneWeapon = {spellID = 47568, talentID = 96178},
+		IceboundFortitude = {spellID = 48792, talentID = 96213},
+		Lichborne = {spellID = 49039},
+		MindFreeze = {spellID = 47528, talentID = 96211},
+		PathofFrost = {spellID = 3714},
+		RaiseAlly = {spellID = 61999},
+		RaiseDead = {spellID = 46585, talentID = 96201},
+		Runeforging = {spellID = 53428},
+		SacrificialPact = {spellID = 327574, talentID = 96203},
+		SoulReaper = {spellID = 343294, talentID = 96181},
+		WraithWalk = {spellID = 212552, talentID = 96207},
 	--Blood
-
+		BloodBoil = {spellID = 50842, talentID = 96305},
+		BloodTap = {spellID = 221699, talentID = 96274},
+		Blooddrinker = {spellID = 206931, talentID = 96276},
+		Bonestorm = {spellID = 194844, talentID = 96258},
+		Consumption = {spellID = 274156, talentID = 96275},
+		DancingRuneWeapon = {spellID = 49028, talentID = 96269},
+		DeathsCaress = {spellID = 195292, talentID = 96279},
+		GorefiendsGrasp = {spellID = 108199, talentID = 96267},
+		HeartStrike = {spellID = 206930, talentID = 96304},
+		MarkofBlood = {spellID = 206940, talentID = 96271},
+		Marrowrend = {spellID = 195182, talentID = 96303},
+		RuneTap = {spellID = 194679, talentID = 96278},
+		Tombstone = {spellID = 219809, talentID = 96270},
+		VampiricBlood = {spellID = 55233, talentID = 96308},
 	}
 	ids.Blood_Passive = {
 	--Death Knight
@@ -96,7 +104,36 @@ local ConRO_DeathKnight, ids = ...;
 		VeteranoftheThirdWar = {spellID = 48263, talentID = 96197},
 		WilloftheNecropolis = {spellID = 206967, talentID = 96182},
 	--Blood
-
+		BloodFeast = {spellID = 391386, talentID = 96167},
+		BloodFortification = {spellID = 374721},
+		BloodWorms = {spellID = 195679, talentID = 96309},
+		Bloodshot = {spellID = 391398, talentID = 96256},
+		Coagulopathy = {spellID = 391477, talentID = 96166},
+		CrimsonScourge = {spellID = 81136, talentID = 96306},
+		EverlastingBond = {spellID = 377668, talentID = 96261},
+		FoulBulwark = {spellID = 206974, talentID = 96302},
+		Heartbreaker = {spellID = 221536, talentID = 96266},
+		Heartrend = {spellID = 377655, talentID = 96262},
+		Hemostasis = {spellID = 273946, talentID = 96268},
+		ImprovedBoneShield = {spellID = 374715, talentID = 96170},
+		ImprovedHeartStrike = {spellID = 374717, talentID = 96257},
+		ImprovedVampiricBlood = {spellID = 317133, talentID = 96272},
+		InsatiableBlade = {spellID = 377637, talentID = 96260},
+		IronHeart = {spellID = 391395, talentID = 96307},
+		LeechingStrike = {spellID = 377629, talentID = 96301},
+		MasteryBloodShield = {spellID = 77513},
+		Ossuary = {spellID = 219786, talentID = 96277},
+		PerseveranceoftheEbonBlade = {spellID = 374747, talentID = 96255},
+		Purgatory = {spellID = 114556, talentID = 96264},
+		RapidDecomposition = {spellID = 194662, talentID = 96273},
+		RedThirst = {spellID = 205723, talentID = 96263},
+		ReinforcedBones = {spellID = 374737, talentID = 96300},
+		RelishinBlood = {spellID = 317610, talentID = 101282},
+		SanguineGround = {spellID = 391458, talentID = 96169},
+		ShatteringBone = {spellID = 377640, talentID = 96259},
+		TighteningGrasp = {spellID = 206970, talentID = 96265},
+		UmbilicusEternus = {spellID = 391517, talentID = 96168},
+		Voracious = {spellID = 273953, talentID = 96171},
 	}
 	ids.Blood_PvPTalent = {
 		RotandWither = 202727,
@@ -109,7 +146,7 @@ local ConRO_DeathKnight, ids = ...;
 		NecroticAura = 199642,
 		DecomposingAura = 199720,
 		DarkSimulacrum = 77606,
-		DomeofAncientShadow = 328718,
+		Spellwarden = 356332,
 	}
 	ids.Blood_Form = {
 
@@ -284,38 +321,40 @@ local ConRO_DeathKnight, ids = ...;
 --Unholy
 	ids.Unholy_Ability = {
 	--Death Knight
-		Acclimation = {spellID = 373926, talentID = 96175},
-		AntiMagicBarrier = {spellID = 205727, talentID = 96174},
-		Assimilation = {spellID = 374383, talentID = 96176},
-		BloodDraw = {spellID = 374598, talentID = 96208},
-		BloodScent = {spellID = 374030, talentID = 96195},
-		Brittle = {spellID = 374504, talentID = 96190},
-		CleavingStrikes = {spellID = 316916, talentID = 96202},
-		ClenchingGrasp = {spellID = 389679, talentID = 96191},
-		Coldthirst = {spellID = 378848, talentID = 96173},
-		DeathsEcho = {spellID = 356367, talentID = 96184},
-		DeathsReach = {spellID = 276079, talentID = 96186},
-		Enfeeble = {spellID = 392566, talentID = 96189},
-		GloomWard = {spellID = 391571, talentID = 96180},
-		GripoftheDead = {spellID = 273952, talentID = 96185},
-		IcyTalons = {spellID = 194878, talentID = 96179},
-		ImprovedDeathStrike = {spellID = 374277, talentID = 96196},
-		InsidiousChill = {spellID = 391566, talentID = 96217},
-		MarchofDarkness = {spellID = 391546, talentID = 96198},
-		MercilessStrikes = {spellID = 373923, talentID = 96214},
-		MightofThassarian = {spellID = 374111, talentID = 96205},
-		OnaPaleHorse = {spellID = 51986},
-		Permafrost = {spellID = 207200, talentID = 96212},
-		ProliferatingChill = {spellID = 373930, talentID = 96215},
-		RuneMastery = {spellID = 374574, talentID = 96209},
-		RunicAttenuation = {spellID = 207104, talentID = 207104},
-		Suppression = {spellID = 374049, talentID = 96204},
-		UnholyBond = {spellID = 374261, talentID = 96183},
-		UnholyEndurance = {spellID = 389682, talentID = 96192},
-		UnholyGround = {spellID = 374265, talentID = 96187},
-		VeteranoftheThirdWar = {spellID = 48263, talentID = 96197},
-		WilloftheNecropolis = {spellID = 206967, talentID = 96182},
+		AbominationLimb = {spellID = 383269, talentID = 96177},
+		AntiMagicShell = {spellID = 48707, talentID = 96199},
+		AntiMagicZone = {spellID = 51052, talentID = 96194},
+		Asphyxiate = {spellID = 221562, talentID = 96193},
+		BlindingSleet = {spellID = 207167, talentID = 96172},
+		ChainsofIce = {spellID = 45524, talentID = 96210},
+		ControlUndead = {spellID = 111673, talentID = 96188},
+		DarkCommand = {spellID = 56222},
+		DeathandDecay = {spellID = 43265},
+		DeathCoil = {spellID = 47541},
+		DeathGate = {spellID = 50977},
+		DeathGrip = {spellID = 49576},
+		DeathStrike = {spellID = 49998, talentID = 96200},
+		DeathPact = {spellID = 48743, talentID = 96206},
+		DeathsAdvance = {spellID = 48265},
+		EmpowerRuneWeapon = {spellID = 47568, talentID = 96178},
+		IceboundFortitude = {spellID = 48792, talentID = 96213},
+		Lichborne = {spellID = 49039},
+		MindFreeze = {spellID = 47528, talentID = 96211},
+		PathofFrost = {spellID = 3714},
+		RaiseAlly = {spellID = 61999},
+		RaiseDead = {spellID = 46585, talentID = 96201},
+		Runeforging = {spellID = 53428},
+		SacrificialPact = {spellID = 327574, talentID = 96203},
+		SoulReaper = {spellID = 343294, talentID = 96181},
+		WraithWalk = {spellID = 212552, talentID = 96207},
 	--Unholy
+		Apocalypse
+		DarkTransformation
+		FesteringStrike
+		Outbreak
+		RaiseDead
+		ScourgeStrike
+		UnholyBlight
 
 	}
 	ids.Unholy_Passive = {
@@ -352,7 +391,12 @@ local ConRO_DeathKnight, ids = ...;
 		VeteranoftheThirdWar = {spellID = 48263, talentID = 96197},
 		WilloftheNecropolis = {spellID = 206967, talentID = 96182},
 	--Unholy
-
+		DarkSuccor
+		MasteryDreadblade
+		Plaguebringer
+		RunicCorruption
+		SuddenDoom
+		
 	}
 	ids.Unholy_PvPTalent = {
 		LifeandDeath = 288855,

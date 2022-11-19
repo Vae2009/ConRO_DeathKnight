@@ -174,31 +174,31 @@ function ConRO.DeathKnight.Blood(_, timeShift, currentSpell, gcd, tChosen, pvpCh
 	wipe(ConRO.SuggestedSpells)
 	local Racial, Ability, Passive, Form, Buff, Debuff, PetAbility, PvPTalent, Glyph = ids.Racial, ids.Blood_Ability, ids.Blood_Passive, ids.Blood_Form, ids.Blood_Buff, ids.Blood_Debuff, ids.Blood_PetAbility, ids.Blood_PvPTalent, ids.Glyph;
 --Info
-	local _Player_Level																														= UnitLevel("player");
-	local _Player_Percent_Health 																									= ConRO:PercentHealth('player');
-	local _is_PvP																																	= ConRO:IsPvP();
-	local _in_combat 																															= UnitAffectingCombat('player');
-	local _party_size																															= GetNumGroupMembers();
+	local _Player_Level = UnitLevel("player");
+	local _Player_Percent_Health = ConRO:PercentHealth('player');
+	local _is_PvP = ConRO:IsPvP();
+	local _in_combat = UnitAffectingCombat('player');
+	local _party_size = GetNumGroupMembers();
 
-	local _is_PC																																	= UnitPlayerControlled("target");
-	local _is_Enemy 																															= ConRO:TarHostile();
-	local _Target_Health 																													= UnitHealth('target');
-	local _Target_Percent_Health 																									= ConRO:PercentHealth('target');
+	local _is_PC = UnitPlayerControlled("target");
+	local _is_Enemy = ConRO:TarHostile();
+	local _Target_Health = UnitHealth('target');
+	local _Target_Percent_Health = ConRO:PercentHealth('target');
 
 --Resources
-	local _Runes							 																										= dkrunes();
-	local _RunicPower, _RunicPower_Max																						= ConRO:PlayerPower('RunicPower');
+	local _Runes = dkrunes();
+	local _RunicPower, _RunicPower_Max = ConRO:PlayerPower('RunicPower');
 
 --Racials
-	local _AncestralCall, _AncestralCall_RDY																			= ConRO:AbilityReady(Racial.AncestralCall, timeShift);
-	local _ArcanePulse, _ArcanePulse_RDY																					= ConRO:AbilityReady(Racial.ArcanePulse, timeShift);
-	local _Berserking, _Berserking_RDY																						= ConRO:AbilityReady(Racial.Berserking, timeShift);
-	local _ArcaneTorrent, _ArcaneTorrent_RDY																			= ConRO:AbilityReady(Racial.ArcaneTorrent, timeShift);
+	local _AncestralCall, _AncestralCall_RDY = ConRO:AbilityReady(Racial.AncestralCall, timeShift);
+	local _ArcanePulse, _ArcanePulse_RDY = ConRO:AbilityReady(Racial.ArcanePulse, timeShift);
+	local _Berserking, _Berserking_RDY = ConRO:AbilityReady(Racial.Berserking, timeShift);
+	local _ArcaneTorrent, _ArcaneTorrent_RDY = ConRO:AbilityReady(Racial.ArcaneTorrent, timeShift);
 
 --Abilities
 	local _Asphyxiate, _Asphyxiate_RDY																						= ConRO:AbilityReady(Ability.Asphyxiate, timeShift);
 	local _BloodBoil, _BloodBoil_RDY																							= ConRO:AbilityReady(Ability.BloodBoil, timeShift);
-		local _BloodBoil_CHARGES																											= ConRO:SpellCharges(Ability.BloodBoil);
+		local _BloodBoil_CHARGES																											= ConRO:SpellCharges(_BloodBoil);
 		local _BloodPlague_DEBUFF			 																							= ConRO:TargetAura(Debuff.BloodPlague, timeShift);
 		local _CrimsonScourge_BUFF			 																							= ConRO:Aura(Buff.CrimsonScourge, timeShift);
 		local _Hemostasis_BUFF, _Hemostasis_COUNT			 																= ConRO:Aura(Buff.Hemostasis, timeShift);
@@ -215,26 +215,15 @@ function ConRO.DeathKnight.Blood(_, timeShift, currentSpell, gcd, tChosen, pvpCh
 	local _MindFreeze, _MindFreeze_RDY					 																	= ConRO:AbilityReady(Ability.MindFreeze, timeShift);
 	local _Marrowrend, _Marrowrend_RDY				 																		= ConRO:AbilityReady(Ability.Marrowrend, timeShift);
 		local _BoneShield_BUFF, _BoneShield_COUNT			 																= ConRO:Aura(Buff.BoneShield, timeShift + 3);
-
-
 	local _BloodTap, _BloodTap_RDY																								= ConRO:AbilityReady(Ability.BloodTap, timeShift);
-		local _BloodTap_CHARGES, _BloodTap_MAX_CHARGES																= ConRO:SpellCharges(Ability.BloodTap);
-	local _Blooddrinker, _Blooddrinker_RDY																				= ConRO:AbilityReady(iAbility.Blooddrinker, timeShift);
+		local _BloodTap_CHARGES, _BloodTap_MAX_CHARGES																= ConRO:SpellCharges(_BloodTap);
+	local _Blooddrinker, _Blooddrinker_RDY																				= ConRO:AbilityReady(Ability.Blooddrinker, timeShift);
 	local _Bonestorm, _Bonestorm_RDY					 																		= ConRO:AbilityReady(Ability.Bonestorm, timeShift);
 	local _Consumption, _Consumption_RDY					 																= ConRO:AbilityReady(Ability.Consumption, timeShift);
 	local _MarkofBlood, _MarkofBlood_RDY					 																= ConRO:AbilityReady(Ability.MarkofBlood, timeShift);
 	local _Tombstone, _Tombstone_RDY					 																		= ConRO:AbilityReady(Ability.Tombstone, timeShift);
 	local _WraithWalk, _WraithWalk_RDY					 																	= ConRO:AbilityReady(Ability.WraithWalk, timeShift);
-
-	local _BloodforBlood, _BloodforBlood_RDY				 															= ConRO:AbilityReady(PvPTalent.BloodforBlood, timeShift);
-		local _BloodforBlood_BUFF											 																= ConRO:Aura(Buff.BloodforBlood, timeShift);
-
 	local _AbominationLimb, _AbominationLimb_RDY																	= ConRO:AbilityReady(Ability.AbominationLimb, timeShift);
-	local _DeathsDue, _, _DeathsDue_CD																						= ConRO:AbilityReady(Ability.DeathsDue, timeShift);
-	local _ShackletheUnworthy, _ShackletheUnworthy_RDY														= ConRO:AbilityReady(Ability.ShackletheUnworthy, timeShift);
-		local _ShackletheUnworthy_DEBUFF			 																				= ConRO:TargetAura(Debuff.ShackletheUnworthy, timeShift);
-	local _Soulshape, _Soulshape_RDY																							= ConRO:AbilityReady(Ability.Soulshape, timeShift);
-	local _SwarmingMist, _SwarmingMist_RDY																				= ConRO:AbilityReady(Ability.SwarmingMist, timeShift);
 
 --Conditions
 	local _is_moving 																															= ConRO:PlayerSpeed();
@@ -246,11 +235,6 @@ function ConRO.DeathKnight.Blood(_, timeShift, currentSpell, gcd, tChosen, pvpCh
 			_BoneShield_Threshold = 4;
 		end
 
-		if C_Covenants.GetActiveCovenantID() == 3 then
-			_DeathandDecay_RDY = _DeathandDecay_RDY and _DeathsDue_CD <= 0;
-			_DeathandDecay = _DeathsDue;
-		end
-
 --Indicators
 	ConRO:AbilityInterrupt(_MindFreeze, _MindFreeze_RDY and ConRO:Interrupt());
 	ConRO:AbilityInterrupt(_Asphyxiate, _Asphyxiate_RDY and (ConRO:Interrupt() and not _MindFreeze_RDY and _is_PC and _is_Enemy));
@@ -258,110 +242,90 @@ function ConRO.DeathKnight.Blood(_, timeShift, currentSpell, gcd, tChosen, pvpCh
 	ConRO:AbilityTaunt(_DarkCommand, _DarkCommand_RDY and (not ConRO:InRaid() or (ConRO:InRaid() and ConRO:TarYou())));
 	ConRO:AbilityMovement(_DeathsAdvance, _DeathsAdvance_RDY and not _target_in_melee);
 	ConRO:AbilityMovement(_WraithWalk, _WraithWalk_RDY and not _target_in_melee);
-	ConRO:AbilityMovement(_Soulshape, _Soulshape_RDY and not _target_in_melee);
 
 	ConRO:AbilityBurst(_Bonestorm, _Bonestorm_RDY and _RunicPower >= 10 and _enemies_in_melee >= 3 and ConRO:BurstMode(_Bonestorm));
 
 	ConRO:AbilityBurst(_AbominationLimb, _AbominationLimb_RDY and _in_combat and ConRO:BurstMode(_AbominationLimb));
-	ConRO:AbilityBurst(_ShackletheUnworthy, _ShackletheUnworthy_RDY and _in_combat and ConRO:BurstMode(_ShackletheUnworthy));
-	ConRO:AbilityBurst(_SwarmingMist, _SwarmingMist_RDY and _in_combat and ConRO:BurstMode(_SwarmingMist));
 
 --Rotations
-	if not _in_combat then
-		if _Blooddrinker_RDY then
-			return _Blooddrinker;
+		if not _in_combat then
+			if _Blooddrinker_RDY then
+				tinsert(ConRO.SuggestedSpells, _Blooddrinker);
+			end
+
+			if _DeathsCaress_RDY and not _BloodPlague_DEBUFF and not _target_in_melee then
+				tinsert(ConRO.SuggestedSpells, _DeathsCaress);
+			end
 		end
 
-		if _DeathsCaress_RDY and not _BloodPlague_DEBUFF and not _target_in_melee then
-			return _DeathsCaress;
+		if currentSpell == _Blooddrinker then
+			tinsert(ConRO.SuggestedSpells, _Blooddrinker);
 		end
-	end
 
-	if currentSpell == _Blooddrinker then
-		return _Blooddrinker;
-	end
+		if _Marrowrend_RDY and not _BoneShield_BUFF then
+			tinsert(ConRO.SuggestedSpells, _Marrowrend);
+		end
 
-	if _Marrowrend_RDY and not _BoneShield_BUFF then
-		return _Marrowrend;
-	end
+		if _Bonestorm_RDY and _RunicPower >= 100 and _enemies_in_melee >= 3 and ConRO:FullMode(_Bonestorm) then
+			tinsert(ConRO.SuggestedSpells, _Bonestorm);
+		end
 
-	if _Bonestorm_RDY and _RunicPower >= 100 and _enemies_in_melee >= 3 and ConRO:FullMode(_Bonestorm) then
-		return _Bonestorm;
-	end
+		if _DeathStrike_RDY and ((not _BloodShield_BUFF and _Player_Percent_Health <= 75) or _RunicPower == _RunicPower_Max or _Hemostasis_COUNT == 5) then
+			tinsert(ConRO.SuggestedSpells, _DeathStrike);
+		end
 
-	if _HeartStrike_RDY and IsPlayerSpell(_DeathsDue) and _DeathandDecay_DUR <= 1.5 then
-		return _HeartStrike;
-	end
+		if _BloodTap_RDY and (_Runes < 3 or _BloodTap_CHARGES == _BloodTap_MAX_CHARGES) then
+			tinsert(ConRO.SuggestedSpells, _BloodTap);
+		end
 
-	if _DeathStrike_RDY and ((not _BloodShield_BUFF and _Player_Percent_Health <= 75) or _RunicPower == _RunicPower_Max or _Hemostasis_COUNT == 5) then
-		return _DeathStrike;
-	end
+		if _BloodBoil_RDY and _BloodBoil_CHARGES == 2 then
+			tinsert(ConRO.SuggestedSpells, _BloodBoil);
+		end
 
-	if _BloodTap_RDY and (_Runes < 3 or _BloodTap_CHARGES == _BloodTap_MAX_CHARGES) then
-		return _BloodTap;
-	end
+		if _DeathandDecay_RDY and _CrimsonScourge_BUFF and tChosen[Passive.RelishinBlood.talentID] then
+			tinsert(ConRO.SuggestedSpells, _DeathandDecay);
+		end
 
-	if _BloodBoil_RDY and _BloodBoil_CHARGES == 2 then
-		return _BloodBoil;
-	end
+		if _AbominationLimb_RDY and ConRO:FullMode(_AbominationLimb) then
+			tinsert(ConRO.SuggestedSpells, _AbominationLimb);
+		end
 
-	if _SwarmingMist_RDY and ConRO:FullMode(_SwarmingMist) then
-		return _SwarmingMist;
-	end
+		if _Blooddrinker_RDY and not _DancingRuneWeapon_BUFF then
+			tinsert(ConRO.SuggestedSpells, _Blooddrinker);
+		end
 
-	if _DeathandDecay_RDY and _CrimsonScourge_BUFF and tChosen[Talent.RelishinBlood] then
-		return _DeathandDecay;
-	end
+		if _BloodBoil_RDY and not _BloodPlague_DEBUFF then
+			tinsert(ConRO.SuggestedSpells, _BloodBoil);
+		end
 
-	if _ShackletheUnworthy_RDY and ConRO:FullMode(_ShackletheUnworthy) then
-		return _ShackletheUnworthy;
-	end
+		if _Marrowrend_RDY and _BoneShield_COUNT <= _BoneShield_Threshold then
+			tinsert(ConRO.SuggestedSpells, _Marrowrend);
+		end
 
-	if _AbominationLimb_RDY and ConRO:FullMode(_AbominationLimb) then
-		return _AbominationLimb;
-	end
+		if _DeathandDecay_RDY and _Runes >= 3 and _enemies_in_melee >= 3 then
+			tinsert(ConRO.SuggestedSpells, _DeathandDecay);
+		end
 
-	if _Blooddrinker_RDY and not _DancingRuneWeapon_BUFF then
-		return _Blooddrinker;
-	end
+		if _HeartStrike_RDY and _Runes >= 3 and _BoneShield_COUNT >= 5 then
+			tinsert(ConRO.SuggestedSpells, _HeartStrike);
+		end
 
-	if _BloodBoil_RDY and not _BloodPlague_DEBUFF then
-		return _BloodBoil;
-	end
+		if _BloodBoil_RDY and _DancingRuneWeapon_BUFF then
+			tinsert(ConRO.SuggestedSpells, _BloodBoil);
+		end
 
-	if _Marrowrend_RDY and _BoneShield_COUNT <= _BoneShield_Threshold then
-		return _Marrowrend;
-	end
+		if _DeathandDecay_RDY and _CrimsonScourge_BUFF then
+			tinsert(ConRO.SuggestedSpells, _DeathandDecay);
+		end
 
-	if _DeathandDecay_RDY and _Runes >= 3 and _enemies_in_melee >= 3 then
-		return _DeathandDecay;
-	end
+		if _Consumption_RDY then
+			tinsert(ConRO.SuggestedSpells, _Consumption);
+		end
 
-	if _BloodforBlood_RDY and _Runes >= 3 and _BoneShield_COUNT >= 5 and not _BloodforBlood_BUFF and _Player_Percent_Health >= 65 then
-		return _BloodforBlood;
-	end
-
-	if _HeartStrike_RDY and _Runes >= 3 and _BoneShield_COUNT >= 5 then
-		return _HeartStrike;
-	end
-
-	if _BloodBoil_RDY and _DancingRuneWeapon_BUFF then
-		return _BloodBoil;
-	end
-
-	if _DeathandDecay_RDY and _CrimsonScourge_BUFF then
-		return _DeathandDecay;
-	end
-
-	if _Consumption_RDY then
-		return _Consumption;
-	end
-
-	if _BloodBoil_RDY then
-		return _BloodBoil;
-	end
-
-return nil;
+		if _BloodBoil_RDY then
+			tinsert(ConRO.SuggestedSpells, _BloodBoil);
+		end
+		return nil;
 end
 
 function ConRO.DeathKnight.BloodDef(_, timeShift, currentSpell, gcd, tChosen, pvpChosen)
@@ -396,11 +360,8 @@ function ConRO.DeathKnight.BloodDef(_, timeShift, currentSpell, gcd, tChosen, pv
 	local _SacrificialPact, _SacrificialPact_RDY																	= ConRO:AbilityReady(Ability.SacrificialPact, timeShift);
 	local _VampiricBlood, _VampiricBlood_RDY			 																= ConRO:AbilityReady(Ability.VampiricBlood, timeShift);
 
-	local _Blooddrinker, _Blooddrinker_RDY 																				= ConRO:AbilityReady(Talent.Blooddrinker, timeShift);
-	local _DeathPact, _DeathPact_RDY 																							= ConRO:AbilityReady(Talent.DeathPact, timeShift);
-
-	local _Fleshcraft, _Fleshcraft_RDY																						= ConRO:AbilityReady(Ability.Fleshcraft, timeShift);
-	local _PhialofSerenity, _PhialofSerenity_RDY																	= ConRO:ItemReady(Ability.PhialofSerenity, timeShift);
+	local _Blooddrinker, _Blooddrinker_RDY 																				= ConRO:AbilityReady(Ability.Blooddrinker, timeShift);
+	local _DeathPact, _DeathPact_RDY 																							= ConRO:AbilityReady(Ability.DeathPact, timeShift);
 
 --Conditions
 	local _is_moving 																															= ConRO:PlayerSpeed();
@@ -408,10 +369,6 @@ function ConRO.DeathKnight.BloodDef(_, timeShift, currentSpell, gcd, tChosen, pv
 	local _target_in_10yrds 																											= CheckInteractDistance("target", 3);
 
 --Rotations
-		if _Fleshcraft_RDY and not _in_combat then
-			tinsert(ConRO.SuggestedDefSpells, _Fleshcraft);
-		end
-
 		if _SacrificialPact_RDY and _Player_Percent_Health <= 20 and _RaiseDead_CD > 60 then
 			tinsert(ConRO.SuggestedDefSpells, _SacrificialPact);
 		end
@@ -444,10 +401,6 @@ function ConRO.DeathKnight.BloodDef(_, timeShift, currentSpell, gcd, tChosen, pv
 			tinsert(ConRO.SuggestedDefSpells, _DeathStrike);
 		end
 
-		if _PhialofSerenity_RDY and _Player_Percent_Health <= 80 then
-			tinsert(ConRO.SuggestedDefSpells, _PhialofSerenity);
-		end
-
 		if _DancingRuneWeapon_RDY then
 			tinsert(ConRO.SuggestedDefSpells, _DancingRuneWeapon);
 		end
@@ -458,10 +411,6 @@ function ConRO.DeathKnight.BloodDef(_, timeShift, currentSpell, gcd, tChosen, pv
 
 		if _IceboundFortitude_RDY then
 			tinsert(ConRO.SuggestedDefSpells, _IceboundFortitude);
-		end
-
-		if _Fleshcraft_RDY then
-			tinsert(ConRO.SuggestedDefSpells, _Fleshcraft);
 		end
 	return nil;
 end
