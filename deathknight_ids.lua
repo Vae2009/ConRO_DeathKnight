@@ -348,14 +348,20 @@ local ConRO_DeathKnight, ids = ...;
 		SoulReaper = {spellID = 343294, talentID = 96181},
 		WraithWalk = {spellID = 212552, talentID = 96207},
 	--Unholy
-		Apocalypse
-		DarkTransformation
-		FesteringStrike
-		Outbreak
-		RaiseDead
-		ScourgeStrike
-		UnholyBlight
-
+		Apocalypse = {spellID = 275699, talentID = 96322},
+		ArmyoftheDead = {spellID = 42650, talentID = 96333},
+		ClawingShadows = {spellID = 207311, talentID = 96320},
+		DarkTransformation = {spellID = 63560, talentID = 96324},
+		Defile = {spellID = 152280, talentID = 96315},
+		Epidemic = {spellID = 207317, talentID = 96295},
+		FesteringStrike = {spellID = 85948, talentID = 96326},
+		Outbreak = {spellID = 77575, talentID = 96328},
+		RaiseDead = {spellID = 46584, talentID = 96325},
+		ScourgeStrike = {spellID = 55090, talentID = 96327},
+		SummonGargoyle = {spellID = 49206, talentID = 96311},
+		UnholyAssault = {spellID = 207289, talentID = 96285},
+		UnholyBlight = {spellID = 115989, talentID = 96296},
+		VileContagion = {spellID = 390279, talentID = 96293},
 	}
 	ids.Unholy_Passive = {
 	--Death Knight
@@ -391,12 +397,39 @@ local ConRO_DeathKnight, ids = ...;
 		VeteranoftheThirdWar = {spellID = 48263, talentID = 96197},
 		WilloftheNecropolis = {spellID = 206967, talentID = 96182},
 	--Unholy
-		DarkSuccor
-		MasteryDreadblade
-		Plaguebringer
-		RunicCorruption
-		SuddenDoom
-		
+		AllWillServe = {spellID = 194916, talentID = 96317},
+		ArmyoftheDamned = {spellID = 276837, talentID = 96287},
+		BurstingSores = {spellID = 207264, talentID = 96299},
+		CoilofDevastation = {spellID = 390270, talentID = 96290},
+		CommanderoftheDead = {spellID = 390259, talentID = 96283},
+		DarkSuccor = {spellID = 178819},
+		DeathRot = {spellID = 377537, talentID = 96292},
+		EbonFever = {spellID = 207269, talentID = 96298},
+		EternalAgony = {spellID = 390268, talentID = 96332},
+		FeastingStrikes = {spellID = 390161, talentID = 96330},
+		Festermight = {spellID = 377590, talentID = 96286},
+		GhoulishFrenzy = {spellID = 377587, talentID = 96288},
+		HarbingerofDoom = {spellID = 276023, talentID = 96310},
+		ImprovedDeathCoil = {spellID = 377580, talentID = 96321},
+		ImprovedFesteringStrike = {spellID = 316867, talentID = 96329},
+		InfectedClaws = {spellID = 207272, talentID = 96318},
+		MagusoftheDead = {spellID = 390196, talentID = 96282},
+		MasteryDreadblade = {spellID = 77515},
+		Morbidity = {spellID = 377592, talentID = 96334},
+		Pestilence = {spellID = 277234, talentID = 96291},
+		PestilentPustules = {spellID = 194917, talentID = 96294},
+		Plaguebringer = {spellID = 390175, talentID = 96319},
+		Reaping = {spellID = 377514, talentID = 96312},
+		ReplenishingWounds = {spellID = 377585, talentID = 96297},
+		RottenTouch = {spellID = 390275, talentID = 96313},
+		RunicCorruption = {spellID = 51462},
+		RunicMastery = {spellID = 390166, talentID = 96323},
+		RupturedViscera = {spellID = 390236, talentID = 96281},
+		SuddenDoom = {spellID = 49530, talentID = 96314},
+		Superstrain = {spellID = 390283, talentID = 96289},
+		UnholyAura = {spellID = 377440, talentID = 96284},
+		UnholyCommand = {spellID = 316941, talentID = 96331},
+		UnholyPact = {spellID = 319230, talentID = 96316},
 	}
 	ids.Unholy_PvPTalent = {
 		LifeandDeath = 288855,
