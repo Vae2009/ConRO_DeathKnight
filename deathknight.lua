@@ -100,6 +100,8 @@ function ConRO.DeathKnight.Disabled(_, timeShift, currentSpell, gcd, tChosen, pv
 end
 
 function ConRO.DeathKnight.Under10(_, timeShift, currentSpell, gcd, tChosen, pvpChosen)
+	wipe(ConRO.SuggestedSpells)
+	local Racial, Ability, Passive, Form, Buff, Debuff, PetAbility, PvPTalent, Glyph = ids.Racial, ids.DeathKnight_Ability, ids.DeathKnight_Passive, ids.DeathKnight_Form, ids.DeathKnight_Buff, ids.DeathKnight_Debuff, ids.DeathKnight_PetAbility, ids.DeathKnight_PvPTalent, ids.Glyph;
 --Info
 	local _Player_Level = UnitLevel("player");
 	local _Player_Percent_Health = ConRO:PercentHealth('player');
@@ -136,6 +138,8 @@ function ConRO.DeathKnight.Under10(_, timeShift, currentSpell, gcd, tChosen, pvp
 end
 
 function ConRO.DeathKnight.Under10Def(_, timeShift, currentSpell, gcd, tChosen, pvpChosen)
+	wipe(ConRO.SuggestedDefSpells)
+	local Racial, Ability, Passive, Form, Buff, Debuff, PetAbility, PvPTalent, Glyph = ids.Racial, ids.DeathKnight_Ability, ids.DeathKnight_Passive, ids.DeathKnight_Form, ids.DeathKnight_Buff, ids.DeathKnight_Debuff, ids.DeathKnight_PetAbility, ids.DeathKnight_PvPTalent, ids.Glyph;
 --Info
 	local _Player_Level																														= UnitLevel("player");
 	local _Player_Percent_Health 																									= ConRO:PercentHealth('player');
@@ -897,48 +901,54 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 	local _ArcaneTorrent, _ArcaneTorrent_RDY																			= ConRO:AbilityReady(Racial.ArcaneTorrent, timeShift);
 
 --Abilities
-	local _Apocalypse, _Apocalypse_RDY, _Apocalypse_CD, _Apocalypse_MaxCD					= ConRO:AbilityReady(Ability.Apocalypse, timeShift);
-	local _ArmyoftheDead, _ArmyoftheDead_RDY			 																= ConRO:AbilityReady(Ability.ArmyoftheDead, timeShift);
-	local _DarkTransformation, _DarkTransformation_RDY, _DarkTransformation_CD		= ConRO:AbilityReady(Ability.DarkTransformation, timeShift);
-		local _DarkTransformation_BUFF																								= ConRO:UnitAura(Buff.DarkTransformation, timeShift, "pet");
-	local _DeathandDecay, _DeathandDecay_RDY			 																= ConRO:AbilityReady(Ability.DeathandDecay, timeShift);
-		local _DeathandDecay_BUFF																											= ConRO:Aura(Buff.DeathandDecay, timeShift);
-	local _DeathCoil, _DeathCoil_RDY																							= ConRO:AbilityReady(Ability.DeathCoil, timeShift);
-		local _SuddenDoom_BUFF					 																							= ConRO:Aura(Buff.SuddenDoom, timeShift);
-	local _DeathStrike, _DeathStrike_RDY					 																= ConRO:AbilityReady(Ability.DeathStrike, timeShift);
-		local _DarkSuccor_BUFF					 																							= ConRO:Aura(Buff.DarkSuccor, timeShift);
-	local _DeathsAdvance, _DeathsAdvance_RDY				 															= ConRO:AbilityReady(Ability.DeathsAdvance, timeShift);
-	local _Epidemic, _Epidemic_RDY						 																		= ConRO:AbilityReady(Ability.Epidemic, timeShift);
-	local _FesteringStrike, _FesteringStrike_RDY				 													= ConRO:AbilityReady(Ability.FesteringStrike, timeShift);
-		local _FesteringWound_DEBUFF, _FesteringWound_COUNT 													= ConRO:TargetAura(Debuff.FesteringWound, timeShift);
-	local _MindFreeze, _MindFreeze_RDY																						= ConRO:AbilityReady(Ability.MindFreeze, timeShift);
-	local _Outbreak, _Outbreak_RDY																								= ConRO:AbilityReady(Ability.Outbreak, timeShift);
-		local _VirulentPlague_DEBUFF			 																						= ConRO:TargetAura(Debuff.VirulentPlague, timeShift);
-	local _RaiseDead, _RaiseDead_RDY					 																		= ConRO:AbilityReady(Ability.RaiseDead, timeShift);
-	local _ScourgeStrike, _ScourgeStrike_RDY				 															= ConRO:AbilityReady(Ability.ScourgeStrike, timeShift);
+	local _Apocalypse, _Apocalypse_RDY, _Apocalypse_CD, _Apocalypse_MaxCD = ConRO:AbilityReady(Ability.Apocalypse, timeShift);
+	local _ArmyoftheDead, _ArmyoftheDead_RDY = ConRO:AbilityReady(Ability.ArmyoftheDead, timeShift);
+	local _DarkTransformation, _DarkTransformation_RDY, _DarkTransformation_CD = ConRO:AbilityReady(Ability.DarkTransformation, timeShift);
+		local _DarkTransformation_BUFF = ConRO:UnitAura(Buff.DarkTransformation, timeShift, "pet");
+	local _DeathandDecay, _DeathandDecay_RDY = ConRO:AbilityReady(Ability.DeathandDecay, timeShift);
+		local _DeathandDecay_BUFF = ConRO:Aura(Buff.DeathandDecay, timeShift);
+	local _DeathCoil, _DeathCoil_RDY = ConRO:AbilityReady(Ability.DeathCoil, timeShift);
+		local _SuddenDoom_BUFF = ConRO:Aura(Buff.SuddenDoom, timeShift);
+	local _DeathStrike, _DeathStrike_RDY = ConRO:AbilityReady(Ability.DeathStrike, timeShift);
+		local _DarkSuccor_BUFF = ConRO:Aura(Buff.DarkSuccor, timeShift);
+	local _DeathsAdvance, _DeathsAdvance_RDY = ConRO:AbilityReady(Ability.DeathsAdvance, timeShift);
+	local _EmpowerRuneWeapon, _EmpowerRuneWeapon_RDY = ConRO:AbilityReady(Ability.EmpowerRuneWeapon, timeShift);
+		local _EmpowerRuneWeapon_BUFF = ConRO:Aura(Buff.EmpowerRuneWeapon, timeShift);
+	local _Epidemic, _Epidemic_RDY = ConRO:AbilityReady(Ability.Epidemic, timeShift);
+	local _FesteringStrike, _FesteringStrike_RDY = ConRO:AbilityReady(Ability.FesteringStrike, timeShift);
+		local _FesteringWound_DEBUFF, _FesteringWound_COUNT = ConRO:TargetAura(Debuff.FesteringWound, timeShift);
+	local _MindFreeze, _MindFreeze_RDY = ConRO:AbilityReady(Ability.MindFreeze, timeShift);
+	local _Outbreak, _Outbreak_RDY = ConRO:AbilityReady(Ability.Outbreak, timeShift);
+		local _VirulentPlague_DEBUFF = ConRO:TargetAura(Debuff.VirulentPlague, timeShift);
+	local _RaiseDead, _RaiseDead_RDY = ConRO:AbilityReady(Ability.RaiseDead, timeShift);
+	local _ScourgeStrike, _ScourgeStrike_RDY = ConRO:AbilityReady(Ability.ScourgeStrike, timeShift);
 
-	local _Asphyxiate, _Asphyxiate_RDY																						= ConRO:AbilityReady(Ability.Asphyxiate, timeShift);
-	local _ClawingShadows, _ClawingShadows_RDY																		= ConRO:AbilityReady(Ability.ClawingShadows, timeShift);
-	local _Defile, _Defile_RDY																										= ConRO:AbilityReady(Ability.Defile, timeShift);
-	local _SoulReaper, _SoulReaper_RDY					 																	= ConRO:AbilityReady(Ability.SoulReaper, timeShift);
-	local _SummonGargoyle, _SummonGargoyle_RDY, _SummonGargoyle_CD								= ConRO:AbilityReady(Ability.SummonGargoyle, timeShift);
-	local _UnholyAssault, _UnholyAssault_RDY					 														= ConRO:AbilityReady(Ability.UnholyAssault, timeShift);
-	local _UnholyBlight, _UnholyBlight_RDY, _UnholyBlight_CD, _UnholyBlight_MaxCD	= ConRO:AbilityReady(Ability.UnholyBlight, timeShift);
-		local _UnholyBlight_DEBUFF																										= ConRO:TargetAura(Debuff.UnholyBlight, timeShift);
-	local _WraithWalk, _WraithWalk_RDY					 																	= ConRO:AbilityReady(Ability.WraithWalk, timeShift);
+	local _Asphyxiate, _Asphyxiate_RDY = ConRO:AbilityReady(Ability.Asphyxiate, timeShift);
+	local _ClawingShadows, _ClawingShadows_RDY = ConRO:AbilityReady(Ability.ClawingShadows, timeShift);
+	local _Defile, _Defile_RDY = ConRO:AbilityReady(Ability.Defile, timeShift);
+	local _SoulReaper, _SoulReaper_RDY = ConRO:AbilityReady(Ability.SoulReaper, timeShift);
+	local _SummonGargoyle, _SummonGargoyle_RDY, _SummonGargoyle_CD = ConRO:AbilityReady(Ability.SummonGargoyle, timeShift);
+	local _UnholyAssault, _UnholyAssault_RDY = ConRO:AbilityReady(Ability.UnholyAssault, timeShift);
+	local _UnholyBlight, _UnholyBlight_RDY, _UnholyBlight_CD, _UnholyBlight_MaxCD = ConRO:AbilityReady(Ability.UnholyBlight, timeShift);
+		local _UnholyBlight_DEBUFF = ConRO:TargetAura(Debuff.UnholyBlight, timeShift);
+	local _WraithWalk, _WraithWalk_RDY = ConRO:AbilityReady(Ability.WraithWalk, timeShift);
 
-	local _AbominationLimb, _AbominationLimb_RDY																	= ConRO:AbilityReady(Ability.AbominationLimb, timeShift);
+	local _AbominationLimb, _AbominationLimb_RDY = ConRO:AbilityReady(Ability.AbominationLimb, timeShift);
 
 --Conditions
-	local _is_moving 																															= ConRO:PlayerSpeed();
-	local _enemies_in_melee, _target_in_melee																			= ConRO:Targets("Melee");
-	local _target_in_10yrds 																											= CheckInteractDistance("target", 3);
-	local _can_execute																														= _Target_Percent_Health <= 35;
+	local _is_moving = ConRO:PlayerSpeed();
+	local _enemies_in_melee, _target_in_melee = ConRO:Targets("Melee");
+	local _target_in_10yrds = CheckInteractDistance("target", 3);
+	local _can_execute = _Target_Percent_Health <= 35;
 
-	local _Pet_summoned 																													= ConRO:CallPet();
-	local _Pet_assist 																														= ConRO:PetAssist();
-	local _Pet_Percent_Health																											= ConRO:PercentHealth('pet');
-	local _Ghoul_out																															= IsSpellKnown(PetAbility.Claw, true);
+	local _Pet_summoned = ConRO:CallPet();
+	local _Pet_assist = ConRO:PetAssist();
+	local _Pet_Percent_Health = ConRO:PercentHealth('pet');
+	local _Ghoul_out = IsSpellKnown(PetAbility.Claw, true);
+
+	if tChosen[Ability.Defile.talentID] then
+		_DeathandDecay, _DeathandDecay_RDY = _Defile, _Defile_RDY;
+	end
 
 --Indicators
 	ConRO:AbilityInterrupt(_MindFreeze, _MindFreeze_RDY and ConRO:Interrupt());
@@ -946,7 +956,7 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 	ConRO:AbilityPurge(_ArcaneTorrent, _ArcaneTorrent_RDY and _target_in_melee and ConRO:Purgable());
 	ConRO:AbilityMovement(_DeathsAdvance, _DeathsAdvance_RDY and not _target_in_melee);
 	ConRO:AbilityMovement(_WraithWalk, _WraithWalk_RDY and not _target_in_melee);
-	
+
 	ConRO:AbilityBurst(_ArmyoftheDead, _ArmyoftheDead_RDY);
 	ConRO:AbilityBurst(_DarkTransformation, _in_combat and _DarkTransformation_RDY and _Ghoul_out and ConRO:BurstMode(_DarkTransformation));
 	ConRO:AbilityBurst(_Apocalypse, _in_combat and _Apocalypse_RDY and _FesteringWound_COUNT >= 4 and ConRO:BurstMode(_Apocalypse));
@@ -1021,21 +1031,19 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 			_UnholyAssault_RDY = false;
 		end
 
+		if _EmpowerRuneWeapon_RDY and not _EmpowerRuneWeapon_BUFF and _Runes < 6 and ConRO:FullMode(_EmpowerRuneWeapon, 120) then
+			tinsert(ConRO.SuggestedSpells, _EmpowerRuneWeapon);
+			_EmpowerRuneWeapon_RDY = false;
+		end
+
 		if _AbominationLimb_RDY and ConRO:FullMode(_AbominationLimb) then
 			tinsert(ConRO.SuggestedSpells, _AbominationLimb);
 			_AbominationLimb_RDY = false;
 		end
 
-		if tChosen[Ability.Defile.talentID] then
-			if _Defile_RDY then
-				tinsert(ConRO.SuggestedSpells, _Defile);
-				_Defile_RDY = false;
-			end
-		else
-			if _DeathandDecay_RDY and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 2) or ConRO_AoEButton:IsVisible() or tChosen[Passive.Pestilence.talentID]) then
-				tinsert(ConRO.SuggestedSpells, _DeathandDecay);
-				_DeathandDecay_RDY = false;
-			end
+		if _DeathandDecay_RDY and not _DeathandDecay_BUFF and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 2) or ConRO_AoEButton:IsVisible()) then
+			tinsert(ConRO.SuggestedSpells, _DeathandDecay);
+			_DeathandDecay_BUFF = true;
 		end
 
 		if ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 2) or ConRO_AoEButton:IsVisible()) and _Runes >= 1 and _DeathandDecay_BUFF then
