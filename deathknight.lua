@@ -922,6 +922,7 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 		local _VirulentPlague_DEBUFF = ConRO:TargetAura(Debuff.VirulentPlague, timeShift);
 	local _RaiseDead, _RaiseDead_RDY = ConRO:AbilityReady(Ability.RaiseDead, timeShift);
 	local _ScourgeStrike, _ScourgeStrike_RDY = ConRO:AbilityReady(Ability.ScourgeStrike, timeShift);
+		local _Plaguebringer_BUFF = ConRO:Aura(Buff.Plaguebringer, timeShift);
 
 	local _Asphyxiate, _Asphyxiate_RDY = ConRO:AbilityReady(Ability.Asphyxiate, timeShift);
 	local _ClawingShadows, _ClawingShadows_RDY = ConRO:AbilityReady(Ability.ClawingShadows, timeShift);
@@ -971,7 +972,7 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 
 --Rotations
 		if not _in_combat then
-			if _Outbreak_RDY and not _VirulentPlague_DEBUFF and (not tChosen[Ability.UnholyBlight.talentID] or (tChosen[Ability.UnholyBlight.talentID] and (_UnholyBlight_CD >= 10 or ConRO:BurstMode(_UnholyBlight)))) then
+			if _Outbreak_RDY and not _VirulentPlague_DEBUFF then
 				tinsert(ConRO.SuggestedSpells, _Outbreak);
 				_Outbreak_RDY = false;
 				_Runes = _Runes - 1;
@@ -999,20 +1000,20 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 			_RunicPower = _RunicPower - 30;
 		end
 
-		if _UnholyBlight_RDY and (_DarkTransformation_RDY or _DarkTransformation_BUFF) and not (_VirulentPlague_DEBUFF and _UnholyBlight_DEBUFF) and ConRO:FullMode(_UnholyBlight) then
+		if _SoulReaper_RDY and _Runes >= 1 and _can_execute then
+			tinsert(ConRO.SuggestedSpells, _SoulReaper);
+			_SoulReaper_RDY = false;
+			_Runes = _Runes - 1;
+		end
+
+		if _UnholyBlight_RDY and not _VirulentPlague_DEBUFF and ConRO:FullMode(_UnholyBlight) then
 			tinsert(ConRO.SuggestedSpells, _UnholyBlight);
 			_UnholyBlight_RDY = false;
 			_Runes = _Runes - 1;
 		end
 
-		if _Outbreak_RDY and not _VirulentPlague_DEBUFF and (not tChosen[Ability.UnholyBlight.talentID] or (tChosen[Ability.UnholyBlight.talentID] and (_UnholyBlight_CD >= 10 or ConRO:BurstMode(_UnholyBlight))) or ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 2) or ConRO_AoEButton:IsVisible())) then
+		if _Outbreak_RDY and not _VirulentPlague_DEBUFF then
 			tinsert(ConRO.SuggestedSpells, _Outbreak);
-			_Runes = _Runes - 1;
-		end
-
-		if _SoulReaper_RDY and _Runes >= 1 and _can_execute then
-			tinsert(ConRO.SuggestedSpells, _SoulReaper);
-			_SoulReaper_RDY = false;
 			_Runes = _Runes - 1;
 		end
 
@@ -1046,7 +1047,7 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 			_DeathandDecay_BUFF = true;
 		end
 
-		if ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 2) or ConRO_AoEButton:IsVisible()) and _Runes >= 1 and _DeathandDecay_BUFF then
+		if ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 3) or ConRO_AoEButton:IsVisible()) and _Runes >= 1 and _DeathandDecay_BUFF then
 			if _ClawingShadows_RDY and tChosen[Ability.ClawingShadows.talentID] and ((_FesteringWound_COUNT >= 1 and (not _Apocalypse_RDY or _Apocalypse_CD > 5)) or (_FesteringWound_COUNT >= 5 and _Apocalypse_RDY)) then
 				tinsert(ConRO.SuggestedSpells, _ClawingShadows);
 				_Runes = _Runes - 1;
@@ -1056,28 +1057,44 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 			end
 		end
 
-		if _Epidemic_RDY and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 2) or ConRO_AoEButton:IsVisible()) then
+		if _Epidemic_RDY and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 4) or ConRO_AoEButton:IsVisible()) then
 			tinsert(ConRO.SuggestedSpells, _Epidemic);
 			_RunicPower = _RunicPower - 30;
 		end
 
-		if _ClawingShadows_RDY and tChosen[Ability.ClawingShadows.talentID] and ((_FesteringWound_COUNT >= 1 and (not _Apocalypse_RDY or _Apocalypse_CD > 5)) or (_FesteringWound_COUNT >= 5 and _Apocalypse_RDY)) then
-			tinsert(ConRO.SuggestedSpells, _ClawingShadows);
-			_Runes = _Runes - 1;
-		elseif _ScourgeStrike_RDY and not tChosen[Ability.ClawingShadows.talentID] and ((_FesteringWound_COUNT >= 1 and (not _Apocalypse_RDY or _Apocalypse_CD > 5)) or (_FesteringWound_COUNT >= 5 and _Apocalypse_RDY)) then
+		if _ScourgeStrike_RDY and tChosen[Passive.Plaguebringer.talentID] and not _Plaguebringer_BUFF then
 			tinsert(ConRO.SuggestedSpells, _ScourgeStrike);
 			_Runes = _Runes - 1;
 		end
 
-		if _FesteringStrike_RDY and _Runes >= 2 and (_FesteringWound_COUNT <= 0 or (_FesteringWound_COUNT <= 4 and (_Apocalypse_RDY or _Apocalypse_CD <= 10))) then
+		if _DeathCoil_RDY and (_SuddenDoom_BUFF or (not tChosen[Passive.RunicMastery.talentID] and _RunicPower >= 80) or _RunicPower >= 100) then
+			tinsert(ConRO.SuggestedSpells, _DeathCoil);
+			_RunicPower = _RunicPower - 30;
+		end
+
+		if _FesteringStrike_RDY and _Runes >= 2 and (_FesteringWound_COUNT <= 2 or (_FesteringWound_COUNT <= 4 and (_Apocalypse_RDY or _Apocalypse_CD <= 10))) then
 			tinsert(ConRO.SuggestedSpells, _FesteringStrike);
+		end
+
+		if ((_FesteringWound_COUNT >= 3 and (not _Apocalypse_RDY or _Apocalypse_CD > 5)) or (_FesteringWound_COUNT >= 5 and _Apocalypse_RDY)) then
+			if tChosen[Ability.ClawingShadows.talentID] then
+				if _ClawingShadows_RDY then
+					tinsert(ConRO.SuggestedSpells, _ClawingShadows);
+					_Runes = _Runes - 1;
+				end
+			else
+				if _ScourgeStrike_RDY then
+					tinsert(ConRO.SuggestedSpells, _ScourgeStrike);
+					_Runes = _Runes - 1;
+				end
+			end
 		end
 
 		if _DeathStrike_RDY and _DarkSuccor_BUFF then
 			tinsert(ConRO.SuggestedSpells, _DeathStrike);
 		end
 
-		if _DeathCoil_RDY and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee == 1) or ConRO_SingleButton:IsVisible()) then
+		if _DeathCoil_RDY then
 			tinsert(ConRO.SuggestedSpells, _DeathCoil);
 			_RunicPower = _RunicPower - 30;
 		end

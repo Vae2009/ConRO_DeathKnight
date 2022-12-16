@@ -454,6 +454,7 @@ local ConRO_DeathKnight, ids = ...;
 		DeathandDecay = 188290,
 		EmpowerRuneWeapon = 47568,
 		Lichborne = 49039,
+		Plaguebringer = 390178,
 		SuddenDoom = 81340,
 		SoulReaper = 215711,
 		Transfusion = 288977,
