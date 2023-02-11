@@ -590,7 +590,7 @@ function ConRO.DeathKnight.Frost(_, timeShift, currentSpell, gcd, tChosen, pvpCh
 
 --Rotations
 		if tChosen[Passive.ColdHeart.talentID] then
-			if tChosen[Ability.Obliteration.talentID] then
+			if tChosen[Passive.Obliteration.talentID] then
 				if _ChainsofIce_RDY and not _PillarofFrost_BUFF and (_ColdHeart_COUNT >= 20 or (_UnholyStrength_BUFF and _UnholyStrength_DUR <= 2 and _ColdHeart_COUNT >= 17)) then
 					tinsert(ConRO.SuggestedSpells, _ChainsofIce);
 				end
