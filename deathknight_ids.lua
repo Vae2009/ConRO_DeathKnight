@@ -11,20 +11,6 @@ local ConRO_DeathKnight, ids = ...;
 		Shadowmeld = {spellID = 58984},
 	}
 
---DeathKnight
-	ids.DeathKnight_Ability = {
-
-	}
-	ids.DeathKnight_Passive = {
-
-	}
-	ids.DeathKnight_Buff = {
-
-	}
-	ids.DeathKnight_Debuff = {
-
-	}
-
 --Blood
 	ids.Blood_Ability = {
 	--Death Knight Baseline
@@ -35,16 +21,14 @@ local ConRO_DeathKnight, ids = ...;
 		DeathGrip = {spellID = 49576},
 		DeathsAdvance = {spellID = 48265},
 		Lichborne = {spellID = 49039},
+		OnaPaleHorse = {spellID = 51986},
 		PathofFrost = {spellID = 3714},
 		RaiseAlly = {spellID = 61999},
 		Runeforging = {spellID = 53428},
-		--Passive
-		OnaPaleHorse = {spellID = 51986},
 	--Blood Baseline
-		--Passive
 		BloodFortification = {spellID = 374721},
 		MasteryBloodShield = {spellID = 77513},
-	--Death Knight Talent
+	--Death Knight
 		AbominationLimb = {spellID = 383269, talentID = 96177},
 		Acclimation = {spellID = 373926, talentID = 96175},
 		AntiMagicBarrier = {spellID = 205727, talentID = 96174},
@@ -91,7 +75,7 @@ local ConRO_DeathKnight, ids = ...;
 		VeteranoftheThirdWar = {spellID = 48263, talentID = 96197},
 		WilloftheNecropolis = {spellID = 206967, talentID = 96182},
 		WraithWalk = {spellID = 212552, talentID = 96207},
-	--Blood Talent
+	--Blood
 		BloodBoil = {spellID = 50842, talentID = 96305},
 		BloodFeast = {spellID = 391386, talentID = 96167},
 		BloodTap = {spellID = 221699, talentID = 96274},
@@ -179,14 +163,12 @@ local ConRO_DeathKnight, ids = ...;
 		DeathGrip = {spellID = 49576},
 		DeathsAdvance = {spellID = 48265},
 		Lichborne = {spellID = 49039},
+		OnaPaleHorse = {spellID = 51986},
 		PathofFrost = {spellID = 3714},
 		RaiseAlly = {spellID = 61999},
 		Runeforging = {spellID = 53428},
-		--Passive
-		OnaPaleHorse = {spellID = 51986},
 	--Frost Baseline
 		RemorselessWinter = {spellID = 196770},
-		--Passive
 		DarkSuccor = {spellID = 178819},
 		MasteryFrozenHeart = {spellID = 77514},
 		MightoftheFrozenWastes = {spellID = 81333},
@@ -239,8 +221,8 @@ local ConRO_DeathKnight, ids = ...;
 		WilloftheNecropolis = {spellID = 206967, talentID = 96182},
 		WraithWalk = {spellID = 212552, talentID = 96207},
 	--Frost
-		AbsoluteZero = {spellID = 377047, talentID = 96223},	
-		Avalanche = {spellID = 207142, talentID = 96235},	
+		AbsoluteZero = {spellID = 377047, talentID = 96223},
+		Avalanche = {spellID = 207142, talentID = 96235},
 		BitingCold = {spellID = 377056, talentID = 96242},
 		Bonegrinder = {spellID = 377098, talentID = 96253},
 		BreathofSindragosa = {spellID = 152279, talentID = 96222},
