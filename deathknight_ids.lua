@@ -305,7 +305,7 @@ local ConRO_DeathKnight, ids = ...;
 		RageoftheFrozenChampion = {spellID = 377076, talentID = 96250},
 		RunicCommand = {spellID = 376251, talentID = 96232},
 		ShatteringBlade = {spellID = 207057, talentID = 96224},
-		ShatteringFrost = {spellID = 455993, talentID = 96223},
+		ShatteredFrost = {spellID = 455993, talentID = 96223},
 		SmotheringOffense = {spellID = 435005, talentID = 96231},
 		TheLongWinter = {spellID = 456240, talentID = 125877},
 		UnleashedFrenzy = {spellID = 376905, talentID = 96248},
@@ -358,6 +358,8 @@ local ConRO_DeathKnight, ids = ...;
 		BreathofSindragosa = 152279,
 	}
 	ids.Frost_Buff = {
+		AFeastofSouls = _;
+		CleavingStrikes = _;
 		ColdHeart = 281209,
 		DarkSuccor = 101568,
 		IcyTalons = 194879,
@@ -368,6 +370,7 @@ local ConRO_DeathKnight, ids = ...;
 		RemorselessWinter = 196770,
 		Rime = 59052,
 		UnholyStrength = 53365,
+		UnleashedFrenzy = 376907,
 		BloodShield = 77535,
 		DeathandDecay = 188290,
 		EmpowerRuneWeapon = 47568,
