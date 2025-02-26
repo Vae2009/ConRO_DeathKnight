@@ -4,6 +4,7 @@ end
 ConRO.DeathKnight.CheckPvPTalents = function()
 end
 local ConRO_DeathKnight, ids = ...;
+local Ability, Buff, Debuff, PvPTalent, Pet_Ability = _, _, _, _, _;
 
 function ConRO:EnableRotationModule(mode)
 	mode = mode or 0;
@@ -12,6 +13,7 @@ function ConRO:EnableRotationModule(mode)
 	if mode == 0 then
 		self.Description = "Death Knight [No Specialization Under 10]";
 		self.NextSpell = ConRO.DeathKnight.Disabled;
+		self.NextDef = ConRO.DeathKnight.Disabled;
 		self.ToggleHealer();
 		ConROWindow:SetAlpha(0);
 		ConRODefenseWindow:SetAlpha(0);
@@ -19,13 +21,16 @@ function ConRO:EnableRotationModule(mode)
 	if mode == 1 then
 		self.Description = 'Death Knight [Blood - Tank]';
 		if ConRO.db.profile._Spec_1_Enabled then
+			Ability, Buff, Debuff, PvPTalent = ids.blood.ability, ids.blood.buff, ids.blood.debuff, ids.blood.pvptalent;
 			self.NextSpell = ConRO.DeathKnight.Blood;
+			self.NextDef = ConRO.DeathKnight.BloodDef;
 			self.ToggleDamage();
 			self.BlockAoE();
 			ConROWindow:SetAlpha(ConRO.db.profile.transparencyWindow);
 			ConRODefenseWindow:SetAlpha(ConRO.db.profile.transparencyWindow);
 		else
 			self.NextSpell = ConRO.DeathKnight.Disabled;
+			self.NextDef = ConRO.DeathKnight.Disabled;
 			self.ToggleHealer();
 			ConROWindow:SetAlpha(0);
 			ConRODefenseWindow:SetAlpha(0);
@@ -34,12 +39,15 @@ function ConRO:EnableRotationModule(mode)
 	if mode == 2 then
 		self.Description = 'Death Knight [Frost - Melee]';
 		if ConRO.db.profile._Spec_2_Enabled then
+			Ability, Buff, Debuff, PvPTalent = ids.frost.ability, ids.frost.buff, ids.frost.debuff, ids.frost.pvptalent;
 			self.NextSpell = ConRO.DeathKnight.Frost;
+			self.NextDef = ConRO.DeathKnight.FrostDef;
 			self.ToggleDamage();
 			ConROWindow:SetAlpha(ConRO.db.profile.transparencyWindow);
 			ConRODefenseWindow:SetAlpha(ConRO.db.profile.transparencyWindow);
 		else
 			self.NextSpell = ConRO.DeathKnight.Disabled;
+			self.NextDef = ConRO.DeathKnight.Disabled;
 			self.ToggleHealer();
 			ConROWindow:SetAlpha(0);
 			ConRODefenseWindow:SetAlpha(0);
@@ -48,12 +56,15 @@ function ConRO:EnableRotationModule(mode)
 	if mode == 3 then
 		self.Description = 'Death Knight [Unholy - Melee]';
 		if ConRO.db.profile._Spec_3_Enabled then
+			Ability, Buff, Debuff, PvPTalent, Pet_Ability = ids.unholy.ability, ids.unholy.buff, ids.unholy.debuff, ids.unholy.pvptalent, ids.unholy.pet_ability;
 			self.NextSpell = ConRO.DeathKnight.Unholy;
+			self.NextDef = ConRO.DeathKnight.UnholyDef;
 			self.ToggleDamage();
 			ConROWindow:SetAlpha(ConRO.db.profile.transparencyWindow);
 			ConRODefenseWindow:SetAlpha(ConRO.db.profile.transparencyWindow);
 		else
 			self.NextSpell = ConRO.DeathKnight.Disabled;
+			self.NextDef = ConRO.DeathKnight.Disabled;
 			self.ToggleHealer();
 			ConROWindow:SetAlpha(0);
 			ConRODefenseWindow:SetAlpha(0);
@@ -64,31 +75,7 @@ function ConRO:EnableRotationModule(mode)
 end
 
 function ConRO:EnableDefenseModule(mode)
-	mode = mode or 0;
-	if mode == 0 then
-		self.NextDef = ConRO.DeathKnight.Disabled;
-	end;
-	if mode == 1 then
-		if ConRO.db.profile._Spec_1_Enabled then
-			self.NextDef = ConRO.DeathKnight.BloodDef;
-		else
-			self.NextDef = ConRO.DeathKnight.Disabled;
-		end
-	end;
-	if mode == 2 then
-		if ConRO.db.profile._Spec_2_Enabled then
-			self.NextDef = ConRO.DeathKnight.FrostDef;
-		else
-			self.NextDef = ConRO.DeathKnight.Disabled;
-		end
-	end;
-	if mode == 3 then
-		if ConRO.db.profile._Spec_3_Enabled then
-			self.NextDef = ConRO.DeathKnight.UnholyDef;
-		else
-			self.NextDef = ConRO.DeathKnight.Disabled;
-		end
-	end;
+
 end
 
 function ConRO:UNIT_SPELLCAST_SUCCEEDED(event, unitID, lineID, spellID)
@@ -133,7 +120,7 @@ local _ArcanePulse, _ArcanePulse_RDY = _, _;
 local _Berserking, _Berserking_RDY = _, _;
 local _ArcaneTorrent, _ArcaneTorrent_RDY = _, _;
 
-local HeroSpec, Racial = ids.HeroSpec, ids.Racial;
+local HeroSpec, Racial = ids.hero_spec, ids.racial;
 
 function ConRO:Stats()
 	_Player_Level = UnitLevel("player");
@@ -168,7 +155,6 @@ end
 function ConRO.DeathKnight.Blood(_, timeShift, currentSpell, gcd, tChosen, pvpChosen)
 	wipe(ConRO.SuggestedSpells);
 	ConRO:Stats();
-	local Ability, Form, Buff, Debuff, PetAbility, PvPTalent = ids.Blood_Ability, ids.Blood_Form, ids.Blood_Buff, ids.Blood_Debuff, ids.Blood_PetAbility, ids.Blood_PvPTalent;
 
 --Abilities
 	local _AbominationLimb, _AbominationLimb_RDY = ConRO:AbilityReady(Ability.AbominationLimb, timeShift);
@@ -411,7 +397,7 @@ function ConRO.DeathKnight.Blood(_, timeShift, currentSpell, gcd, tChosen, pvpCh
 				break;
 			end
 
-			tinsert(ConRO.SuggestedSpells, 289603); --Waiting Spell Icon
+			tinsert(ConRO.SuggestedSpells, 6603); --Waiting Spell Icon
 			_Queue = _Queue + 3;
 			break;
 		end
@@ -422,7 +408,6 @@ end
 function ConRO.DeathKnight.BloodDef(_, timeShift, currentSpell, gcd, tChosen, pvpChosen)
 	wipe(ConRO.SuggestedDefSpells);
 	ConRO:Stats();
-	local Ability, Form, Buff, Debuff, PetAbility, PvPTalent = ids.Blood_Ability, ids.Blood_Form, ids.Blood_Buff, ids.Blood_Debuff, ids.Blood_PetAbility, ids.Blood_PvPTalent;
 
 --Abilities
 	local _DeathPact, _DeathPact_RDY = ConRO:AbilityReady(Ability.DeathPact, timeShift);
@@ -476,13 +461,12 @@ end
 function ConRO.DeathKnight.Frost(_, timeShift, currentSpell, gcd, tChosen, pvpChosen)
 	wipe(ConRO.SuggestedSpells);
 	ConRO:Stats();
-	local Ability, Form, Buff, Debuff, PetAbility, PvPTalent = ids.Frost_Ability, ids.Frost_Form, ids.Frost_Buff, ids.Frost_Debuff, ids.Frost_PetAbility, ids.Frost_PvPTalent;
 
 --Abilities
 	local _AbominationLimb, _AbominationLimb_RDY = ConRO:AbilityReady(Ability.AbominationLimb, timeShift);
 	local _Asphyxiate, _Asphyxiate_RDY = ConRO:AbilityReady(Ability.Asphyxiate, timeShift);
 	local _BreathofSindragosa, _BreathofSindragosa_RDY, _BreathofSindragosa_CD = ConRO:AbilityReady(Ability.BreathofSindragosa, timeShift);
-		local _BreathofSindragosa_FORM = ConRO:Form(Form.BreathofSindragosa);
+		local _BreathofSindragosa_FORM = ConRO:Form(Buff.BreathofSindragosa);
 	local _ChainsofIce, _ChainsofIce_RDY = ConRO:AbilityReady(Ability.ChainsofIce, timeShift);
 		local _, _ColdHeart_COUNT = ConRO:Form(Buff.ColdHeart);
 	local _ChillStreak, _ChillStreak_RDY = ConRO:AbilityReady(Ability.ChillStreak, timeShift);
@@ -1088,7 +1072,7 @@ function ConRO.DeathKnight.Frost(_, timeShift, currentSpell, gcd, tChosen, pvpCh
 				end
 			end
 
-			tinsert(ConRO.SuggestedSpells, 289603); --Waiting Spell Icon
+			tinsert(ConRO.SuggestedSpells, 6603); --Waiting Spell Icon
 			_Queue = _Queue + 3;
 			break;
 		end
@@ -1099,7 +1083,6 @@ end
 function ConRO.DeathKnight.FrostDef(_, timeShift, currentSpell, gcd, tChosen, pvpChosen)
 	wipe(ConRO.SuggestedDefSpells);
 	ConRO:Stats();
-	local Ability, Form, Buff, Debuff, PetAbility, PvPTalent = ids.Frost_Ability, ids.Frost_Form, ids.Frost_Buff, ids.Frost_Debuff, ids.Frost_PetAbility, ids.Frost_PvPTalent;
 
 --Abilities
 	local _DeathPact, _DeathPact_RDY = ConRO:AbilityReady(Ability.DeathPact, timeShift);
@@ -1143,7 +1126,6 @@ end
 function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpChosen)
 	wipe(ConRO.SuggestedSpells);
 	ConRO:Stats();
-	local Ability, Form, Buff, Debuff, PetAbility, PvPTalent = ids.Unholy_Ability, ids.Unholy_Form, ids.Unholy_Buff, ids.Unholy_Debuff, ids.Unholy_PetAbility, ids.Unholy_PvPTalent;
 
 --Abilities
 	local _AbominationLimb, _AbominationLimb_RDY = ConRO:AbilityReady(Ability.AbominationLimb, timeShift);
@@ -1185,9 +1167,9 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 		local _UnholyBlight_DEBUFF = ConRO:TargetAura(Debuff.UnholyBlight, timeShift);
 	local _VileContagion, _VileContagion_RDY = ConRO:AbilityReady(Ability.VileContagion, timeShift);
 	local _WraithWalk, _WraithWalk_RDY = ConRO:AbilityReady(Ability.WraithWalk, timeShift);
-	
+
 --Conditions
-	local _Ghoul_out = IsSpellKnown(PetAbility.Claw, true);
+	local _Ghoul_out = IsSpellKnown(Pet_Ability.Claw, true);
 
 	if tChosen[Ability.Defile.talentID] then
 		_DeathandDecay, _DeathandDecay_RDY = _Defile, _Defile_RDY;
@@ -1246,8 +1228,8 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 
 			if ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 3) or ConRO_AoEButton:IsVisible()) then
 				if _GiftoftheSanlayn_BUFF then
-					if _FesteringScythee_RDY and ConRO:IsOverride(_FesteringStrike) == _FesteringScythe and _Runes >= 2 then
-						tinsert(ConRO.SuggestedSpells, _FesteringStrike);
+					if _FesteringScythe_RDY and ConRO:IsOverride(_FesteringStrike) == _FesteringScythe and _Runes >= 2 then
+						tinsert(ConRO.SuggestedSpells, _FesteringScythe);
 						_Runes = _Runes - 2;
 						_FesteringWound_COUNT = _FesteringWound_COUNT + 2;
 						_Queue = _Queue + 1;
@@ -1299,8 +1281,8 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 						break;
 					end
 
-					if _FesteringScythee_RDY and ConRO:IsOverride(_FesteringStrike) == _FesteringScythe and _Runes >= 2 then
-						tinsert(ConRO.SuggestedSpells, _FesteringStrike);
+					if _FesteringScythe_RDY and ConRO:IsOverride(_FesteringStrike) == _FesteringScythe and _Runes >= 2 then
+						tinsert(ConRO.SuggestedSpells, _FesteringScythe);
 						_Runes = _Runes - 2;
 						_FesteringWound_COUNT = _FesteringWound_COUNT + 2;
 						_Queue = _Queue + 1;
@@ -1369,7 +1351,7 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 					end
 
 					if _FesteringScythe_RDY and ConRO:IsOverride(_FesteringStrike) == _FesteringScythe and _Runes >= 2 then
-						tinsert(ConRO.SuggestedSpells, _FesteringStrike);
+						tinsert(ConRO.SuggestedSpells, _FesteringScythe);
 						_Runes = _Runes - 2;
 						_FesteringWound_COUNT = _FesteringWound_COUNT + 2;
 						_Queue = _Queue + 1;
@@ -1710,7 +1692,7 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 				end
 			end
 
-			tinsert(ConRO.SuggestedSpells, 289603); --Waiting Spell Icon
+			tinsert(ConRO.SuggestedSpells, 6603); --Waiting Spell Icon
 			_Queue = _Queue + 3;
 			break;
 		end
@@ -1721,10 +1703,10 @@ end
 function ConRO.DeathKnight.UnholyDef(_, timeShift, currentSpell, gcd, tChosen, pvpChosen)
 	wipe(ConRO.SuggestedDefSpells);
 	ConRO:Stats();
-	local Ability, Form, Buff, Debuff, PetAbility, PvPTalent = ids.Unholy_Ability, ids.Unholy_Form, ids.Unholy_Buff, ids.Unholy_Debuff, ids.Unholy_PetAbility, ids.Unholy_PvPTalent;
 
 --Abilities
 	local _DeathCoil, _DeathCoil_RDY = ConRO:AbilityReady(Ability.DeathCoil, timeShift);
+	local _DeathPact, _DeathPact_RDY = ConRO:AbilityReady(Ability.DeathPact, timeShift);
 	local _DeathStrike, _DeathStrike_RDY = ConRO:AbilityReady(Ability.DeathStrike, timeShift);
 		local _DarkSuccor_BUFF = ConRO:Aura(Buff.DarkSuccor, timeShift);
 	local _IceboundFortitude, _IceboundFortitude_RDY = ConRO:AbilityReady(Ability.IceboundFortitude, timeShift);
@@ -1732,35 +1714,33 @@ function ConRO.DeathKnight.UnholyDef(_, timeShift, currentSpell, gcd, tChosen, p
 		local _Lichborne_BUFF = ConRO:Aura(Buff.Lichborne, timeShift);
 	local _SacrificialPact, _SacrificialPact_RDY = ConRO:AbilityReady(Ability.SacrificialPact, timeShift);
 
-	local _DeathPact, _DeathPact_RDY = ConRO:AbilityReady(Ability.DeathPact, timeShift);
-
 --Conditions
 	local _Pet_summoned = ConRO:CallPet();
 
 --Rotations
-		if _SacrificialPact_RDY and _Player_Percent_Health <= 20 and _Pet_summoned then
-			tinsert(ConRO.SuggestedDefSpells, _SacrificialPact);
-		end
+	if _SacrificialPact_RDY and _Player_Percent_Health <= 20 and _Pet_summoned then
+		tinsert(ConRO.SuggestedDefSpells, _SacrificialPact);
+	end
 
-		if _DeathPact_RDY and _Player_Percent_Health <= 50 then
-			tinsert(ConRO.SuggestedDefSpells, _DeathPact);
-		end
+	if _DeathPact_RDY and _Player_Percent_Health <= 50 then
+		tinsert(ConRO.SuggestedDefSpells, _DeathPact);
+	end
 
-		if _DeathCoil_RDY and _Lichborne_BUFF and _Player_Percent_Health <= 80 then
-			tinsert(ConRO.SuggestedDefSpells, _DeathCoil);
-		end
+	if _DeathCoil_RDY and _Lichborne_BUFF and _Player_Percent_Health <= 80 then
+		tinsert(ConRO.SuggestedDefSpells, _DeathCoil);
+	end
 
-		if _Lichborne_RDY and _Player_Percent_Health <= 40 then
-			tinsert(ConRO.SuggestedDefSpells, _Lichborne);
-		end
+	if _Lichborne_RDY and _Player_Percent_Health <= 40 then
+		tinsert(ConRO.SuggestedDefSpells, _Lichborne);
+	end
 
-		if _DeathStrike_RDY and ((_DarkSuccor_BUFF and _Player_Percent_Health <= 80) or _Player_Percent_Health <= 30) then
-			tinsert(ConRO.SuggestedDefSpells, _DeathStrike);
-		end
+	if _DeathStrike_RDY and ((_DarkSuccor_BUFF and _Player_Percent_Health <= 80) or _Player_Percent_Health <= 30) then
+		tinsert(ConRO.SuggestedDefSpells, _DeathStrike);
+	end
 
-		if _IceboundFortitude_RDY then
-			tinsert(ConRO.SuggestedDefSpells, _IceboundFortitude);
-		end
+	if _IceboundFortitude_RDY then
+		tinsert(ConRO.SuggestedDefSpells, _IceboundFortitude);
+	end
 	return nil;
 end
 

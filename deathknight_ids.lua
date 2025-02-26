@@ -1,24 +1,25 @@
 local ConRO_DeathKnight, ids = ...;
 
 --General
-	ids.Racial = {
-		AncestralCall = {spellID = 274738},
-		ArcanePulse = {spellID = 260364},
-		ArcaneTorrent = {spellID = 50613},
-		Berserking = {spellID = 26297},
-		Cannibalize = {spellID = 20577},
-		GiftoftheNaaru = {spellID = 59548},
-		Shadowmeld = {spellID = 58984},
-	}
-	ids.HeroSpec = {
-		Sanlayn = 31,
-		RideroftheApocalypse = 32,
-		Deathbringer = 33,
-	}
+ids.racial = {
+	AncestralCall = {spellID = 274738},
+	ArcanePulse = {spellID = 260364},
+	ArcaneTorrent = {spellID = 50613},
+	Berserking = {spellID = 26297},
+	Cannibalize = {spellID = 20577},
+	GiftoftheNaaru = {spellID = 59548},
+	Shadowmeld = {spellID = 58984},
+	Warstomp = {spellID = 20549},
+}
+ids.hero_spec = {
+	Sanlayn = 31,
+	RideroftheApocalypse = 32,
+	Deathbringer = 33,
+}
 
---Blood
-	ids.Blood_Ability = {
-	--Death Knight Baseline
+ids.blood = {
+	ability = {
+	--Baseline
 		AntiMagicShell = {spellID = 48707},
 		ChainsofIce = {spellID = 45524},
 		DarkCommand = {spellID = 56222},
@@ -27,19 +28,17 @@ local ConRO_DeathKnight, ids = ...;
 		DeathGate = {spellID = 50977},
 		DeathGrip = {spellID = 49576},
 		DeathsAdvance = {spellID = 48265},
+		DeathsCaress = {spellID = 195292},
 		Lichborne = {spellID = 49039},
 		PathofFrost = {spellID = 3714},
 		RaiseAlly = {spellID = 61999},
 		Runeforging = {spellID = 53428},
-		--Passive
-		OnaPaleHorse = {spellID = 51986},
-	--Blood Baseline
-		DeathsCaress = {spellID = 195292},
-		--Passive
+	--Passive
 		BloodFortification = {spellID = 374721},
 		CrimsonScourge = {spellID = 81136},
 		MasteryBloodShield = {spellID = 77513},
-	--Death Knight
+		OnaPaleHorse = {spellID = 51986},
+	--Death Knight Talents
 		IceboundFortitude = {spellID = 48792, talentID = 96210},
 		DeathStrike = {spellID = 49998, talentID = 96200},
 		RaiseDead = {spellID = 46585, talentID = 96201},
@@ -86,7 +85,7 @@ local ConRO_DeathKnight, ids = ...;
 		AbominationLimb = {spellID = 383269, talentID = 96177},
 		DeathsEcho = {spellID = 356367, talentID = 126015},
 		VestigialShell = {spellID = 454851, talentID = 96181},
-	--Blood
+	--Blood Talents
 		HeartStrike = {spellID = 206930, talentID = 96304},
 		Marrowrend = {spellID = 195182, talentID = 96303},
 		BloodBoil = {spellID = 50842, talentID = 96305},
@@ -131,7 +130,7 @@ local ConRO_DeathKnight, ids = ...;
 		Purgatory = {spellID = 114556, talentID = 96264},
 		Bloodshot = {spellID = 391398, talentID = 96256},
 		UmbilicusEternus = {spellID = 391517, talentID = 96168},
-	--Hero
+	--Hero Talents
 	--Deathbringer
 		ReapersMark = {spellID = 439843, talentID = 117659},
 		WaveofSouls = {spellID = 439851, talentID = 117633},
@@ -164,8 +163,8 @@ local ConRO_DeathKnight, ids = ...;
 		PactoftheSanlayn = {spellID = 434261, talentID = 117652},
 		SanguineScent = {spellID = 434263, talentID = 117893},
 		GiftoftheSanlayn = {spellID = 434152, talentID = 117650},
-	}
-	ids.Blood_PvPTalent = {
+	},
+	pvptalent = {
 		RotandWither = 202727,
 		WalkingDead = 202731,
 		Strangulate = 47476,
@@ -177,11 +176,8 @@ local ConRO_DeathKnight, ids = ...;
 		DecomposingAura = 199720,
 		DarkSimulacrum = 77606,
 		Spellwarden = 356332,
-	}
-	ids.Blood_Form = {
-
-	}
-	ids.Blood_Buff = {
+	},
+	buff = {
 		BloodforBlood = 233411,
 		BloodShield = 77535,
 		BoneShield = 195181,
@@ -193,19 +189,17 @@ local ConRO_DeathKnight, ids = ...;
 		Hemostasis = 273947,
 		Lichborne = 49039,
 		RuneTap = 194679,
-	}
-	ids.Blood_Debuff = {
+	},
+	debuff = {
 		BloodPlague = 55078,
 		ReapersMark = 434765,
 		ReaperofSouls = 469172,
-	}
-	ids.Blood_PetAbility = {
+	},
+}
 
-	}
-
---Frost
-	ids.Frost_Ability = {
-	--Death Knight Baseline
+ids.frost = {
+	ability = {
+	--Baseline
 		AntiMagicShell = {spellID = 487079},
 		ChainsofIce = {spellID = 45524},
 		DarkCommand = {spellID = 56222},
@@ -217,18 +211,16 @@ local ConRO_DeathKnight, ids = ...;
 		Lichborne = {spellID = 49039},
 		PathofFrost = {spellID = 3714},
 		RaiseAlly = {spellID = 61999},
-		Runeforging = {spellID = 53428},
-		--Passive
-		OnaPaleHorse = {spellID = 51986},
-	--Frost Baseline
 		RemorselessWinter = {spellID = 196770},
-		--Passive
+		Runeforging = {spellID = 53428},
+	--Passive
 		DarkSuccor = {spellID = 178819},
 		MasteryFrozenHeart = {spellID = 77514},
 		MightoftheFrozenWastes = {spellID = 81333},
+		OnaPaleHorse = {spellID = 51986},
 		Rime = {spellID = 59057},
 		RunicEmpowerment = {spellID = 81229},
-	--Death Knight
+	--Death Knight Talents
 		IceboundFortitude = {spellID = 48792, talentID = 96210},
 		DeathStrike = {spellID = 49998, talentID = 96200},
 		RaiseDead = {spellID = 46585, talentID = 96201},
@@ -275,7 +267,7 @@ local ConRO_DeathKnight, ids = ...;
 		AbominationLimb = {spellID = 383269, talentID = 96177},
 		DeathsEcho = {spellID = 356367, talentID = 126015},
 		VestigialShell = {spellID = 454851, talentID = 96181},
-	--Frost
+	--Frost Talents
 		FrostStrike = {spellID = 49143, talentID = 96245},
 		Obliterate = {spellID = 49020, talentID = 96246},
 		HowlingBlast = {spellID = 49184, talentID = 96244},
@@ -319,7 +311,7 @@ local ConRO_DeathKnight, ids = ...;
 		TheLongWinter = {spellID = 456240, talentID = 125877},
 		ShatteredFrost = {spellID = 455993, talentID = 96223},
 		BreathofSindragosa = {spellID = 152279, talentID = 96222},
-	--Hero
+	--Hero Talents
 	--Deathbringer
 		ReapersMark = {spellID = 439843, talentID = 117659},
 		WaveofSouls = {spellID = 439851, talentID = 117633},
@@ -351,8 +343,8 @@ local ConRO_DeathKnight, ids = ...;
 		AFeastofSouls = {spellID = 444072, talentID = 123411},
 		MawswornMenace = {spellID = 444099, talentID = 117651},
 		ApocalypseNow = {spellID = 444040, talentID = 117638},
-	}
-	ids.Frost_PvPTalent = {
+	},
+	pvptalent = {
 		NecroticAura = 199642,
 		Deathchill = 204080,
 		Delirium = 233396,
@@ -363,13 +355,11 @@ local ConRO_DeathKnight, ids = ...;
 		DeadofWinter = 287250,
 		Transfusion = 288977,
 		DomeofAncientShadow = 328718,
-	}
-	ids.Frost_Form = {
+	},
+	buff = {
 		AFeastofSouls = 440861,
-		BreathofSindragosa = 152279,
-	}
-	ids.Frost_Buff = {
 		BloodShield = 77535,
+		BreathofSindragosa = 152279,
 		ColdHeart = 281209,
 		DarkSuccor = 101568,
 		DeathandDecay = 188290,
@@ -384,18 +374,16 @@ local ConRO_DeathKnight, ids = ...;
 		Rime = 59052,
 		UnholyStrength = 53365,
 		UnleashedFrenzy = 376907,
-	}
-	ids.Frost_Debuff = {
+	},
+	debuff = {
 		FrostFever = 55095,
 		RazorIce = 51714,
 	}
-	ids.Frost_PetAbility = {
+}
 
-	}
-
---Unholy
-	ids.Unholy_Ability = {
-	--Death Knight Baseline
+ids.unholy = {
+	ability = {
+	--Baseline
 		AntiMagicShell = {spellID = 48707},
 		ChainsofIce = {spellID = 45524},
 		DarkCommand = {spellID = 56222},
@@ -404,20 +392,18 @@ local ConRO_DeathKnight, ids = ...;
 		DeathGate = {spellID = 50977},
 		DeathGrip = {spellID = 49576},
 		DeathsAdvance = {spellID = 48265},
+		Epidemic = {spellID = 207317},
 		Lichborne = {spellID = 49039},
+		Outbreak = {spellID = 77575},
 		PathofFrost = {spellID = 3714},
 		RaiseAlly = {spellID = 61999},
 		Runeforging = {spellID = 53428},
-		--Passive
-		OnaPaleHorse = {spellID = 51986},
-	--Frost Baseline
-		Epidemic = {spellID = 207317},
-		Outbreak = {spellID = 77575},
-		--Passive
+	--Passive
 		DarkSuccor = {spellID = 178819},
 		MasteryDreadblade = {spellID = 77515},
+		OnaPaleHorse = {spellID = 51986},
 		RunicCorruption = {spellID = 51462},
-	--Death Knight
+	--Death Knight Talents
 		IceboundFortitude = {spellID = 48792, talentID = 96210},
 		DeathStrike = {spellID = 49998, talentID = 96200},
 		RaiseDead = {spellID = 46585, talentID = 96201},
@@ -464,7 +450,7 @@ local ConRO_DeathKnight, ids = ...;
 		AbominationLimb = {spellID = 383269, talentID = 96177},
 		DeathsEcho = {spellID = 356367, talentID = 126015},
 		VestigialShell = {spellID = 454851, talentID = 96181},
-	--Unholy
+	--Unholy Talents
 		FesteringStrike = {spellID = 85948, talentID = 96326},
 		ScourgeStrike = {spellID = 55090, talentID = 96327},
 		RaiseDeadUnholy = {spellID = 46584, talentID = 96325},
@@ -509,7 +495,7 @@ local ConRO_DeathKnight, ids = ...;
 		Superstrain = {spellID = 390283, talentID = 96289},
 		UnholyAssault = {spellID = 207289, talentID = 96285},
 		CommanderoftheDead = {spellID = 390259, talentID = 96283},
-	--Hero
+	--Hero Talents
 	--Rider of the Apocalypse
 		RidersChampion = {spellID = 444005, talentID = 117663},
 		OnaPalerHorse = {spellID = 444008, talentID = 117657},
@@ -541,8 +527,8 @@ local ConRO_DeathKnight, ids = ...;
 		PactoftheSanlayn = {spellID = 434261, talentID = 117652},
 		SanguineScent = {spellID = 434263, talentID = 117893},
 		GiftoftheSanlayn = {spellID = 434152, talentID = 117650},
-	}
-	ids.Unholy_PvPTalent = {
+	},
+	pvp_talent = {
 		LifeandDeath = 288855,
 		DarkSimulacrum = 77606,
 		NecroticStrike = 223829,
@@ -554,11 +540,8 @@ local ConRO_DeathKnight, ids = ...;
 		RaiseAbomination = 288853,
 		Transfusion = 288977,
 		DomeofAncientShadow = 328718,
-	}
-	ids.Unholy_Form = {
-
-	}
-	ids.Unholy_Buff = {
+	},
+	buff = {
 		BloodShield = 77535,
 		DarkSuccor = 101568,
 		DarkTransformation = 63560,
@@ -572,8 +555,8 @@ local ConRO_DeathKnight, ids = ...;
 		SoulReaper = 215711,
 		Transfusion = 288977,
 		UnholyBlight = 115989,
-	}
-	ids.Unholy_Debuff = {
+	},
+	debuff = {
 		DeathRot = 377540,
 		FesteringWound = 194310,
 		NecroticStrike = 223929,
@@ -583,7 +566,8 @@ local ConRO_DeathKnight, ids = ...;
 		TrollbanesIcyFury = 444828,
 		VirulentPlague = 191587,
 		UnholyBlight = 115994,
-	}
-	ids.Unholy_PetAbility = {
+	},
+	pet_ability = {
 		Claw = 47468,
 	}
+}
