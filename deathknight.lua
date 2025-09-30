@@ -120,7 +120,7 @@ local _ArcanePulse, _ArcanePulse_RDY = _, _;
 local _Berserking, _Berserking_RDY = _, _;
 local _ArcaneTorrent, _ArcaneTorrent_RDY = _, _;
 
-local HeroSpec, Racial = ids.hero_spec, ids.racial;
+local HeroSpec, Racial, Runeforge = ids.hero_spec, ids.racial, ids.runeforge;
 
 function ConRO:Stats()
 	_Player_Level = UnitLevel("player");
@@ -157,11 +157,9 @@ function ConRO.DeathKnight.Blood(_, timeShift, currentSpell, gcd, tChosen, pvpCh
 	ConRO:Stats();
 
 --Abilities
-	local _AbominationLimb, _AbominationLimb_RDY = ConRO:AbilityReady(Ability.AbominationLimb, timeShift);
 	local _Asphyxiate, _Asphyxiate_RDY = ConRO:AbilityReady(Ability.Asphyxiate, timeShift);
 	local _BloodBoil, _BloodBoil_RDY = ConRO:AbilityReady(Ability.BloodBoil, timeShift);
 		local _BloodBoil_CHARGES = ConRO:SpellCharges(_BloodBoil);
-		local _BloodPlague_DEBUFF = ConRO:TargetAura(Debuff.BloodPlague, timeShift);
 	local _BloodTap, _BloodTap_RDY = ConRO:AbilityReady(Ability.BloodTap, timeShift);
 		local _BloodTap_CHARGES, _BloodTap_MAX_CHARGES = ConRO:SpellCharges(_BloodTap);
 	local _Blooddrinker, _Blooddrinker_RDY = ConRO:AbilityReady(Ability.Blooddrinker, timeShift);
@@ -183,16 +181,31 @@ function ConRO.DeathKnight.Blood(_, timeShift, currentSpell, gcd, tChosen, pvpCh
 		local _, _BoneShield_COUNT, _BoneShield_DUR = ConRO:Aura(Buff.BoneShield, timeShift);
 	local _RaiseDead, _RaiseDead_RDY = ConRO:AbilityReady(Ability.RaiseDead, timeShift);
 	local _ReapersMark, _ReapersMark_RDY, _ReapersMark_CD = ConRO:AbilityReady(Ability.ReapersMark, timeShift);
-		local _, _Exterminate_COUNT = ConRO:Aura(Buff.Exterminate, timeShift);
-		local _ReaperofSouls_BUFF = ConRO:Aura(Buff.ReaperofSouls, timeShift);
-		local _ReapersMark_DEBUFF = ConRO:TargetAura(Debuff.ReapersMark, timeShift);
 	local _SoulReaper, _SoulReaper_RDY = ConRO:AbilityReady(Ability.SoulReaper, timeShift);
 	local _Tombstone, _Tombstone_RDY = ConRO:AbilityReady(Ability.Tombstone, timeShift);
 	local _WraithWalk, _WraithWalk_RDY = ConRO:AbilityReady(Ability.WraithWalk, timeShift);
 
+--Aura
+	local _, exterminate_COUNT = ConRO:Aura(Buff.exterminate, timeShift)
+	local infliction_of_sorrow_BUFF = ConRO:Aura(Buff.infliction_of_sorrow, timeShift)
+	local _ReaperofSouls_BUFF = ConRO:Aura(Buff.reaper_of_souls, timeShift)
+
+	local _BloodPlague_DEBUFF = ConRO:TargetAura(Debuff.BloodPlague, timeShift)
+	local blood_plague_SPREAD = ConRO:EveryTargetAura(Debuff.BloodPlague)
+	local _ReapersMark_DEBUFF = ConRO:TargetAura(Debuff.ReapersMark, timeShift)
+
 --Conditions
+	local death_strike_COST = 45
+	if tChosen[Ability.ImprovedDeathStrike.talentID] then
+		death_strike_COST = death_strike_COST - 5
+	end
+
+	if tChosen[Ability.Ossuary.talentID] and _BoneShield_COUNT >= 5 then
+		death_strike_COST = death_strike_COST - 5
+	end
+
 	if ConRO:IsOverride(_HeartStrike) == Ability.VampiricStrike.spellID then
-		_HeartStrike, _HeartStrike_RDY = ConRO:AbilityReady(Ability.VampiricStrike, timeShift);
+		_HeartStrike, _HeartStrike_RDY = ConRO:AbilityReady(Ability.VampiricStrike, timeShift)
 	end
 
 --Indicators
@@ -203,7 +216,6 @@ function ConRO.DeathKnight.Blood(_, timeShift, currentSpell, gcd, tChosen, pvpCh
 	ConRO:AbilityMovement(_DeathsAdvance, _DeathsAdvance_RDY and not _target_in_melee);
 	ConRO:AbilityMovement(_WraithWalk, _WraithWalk_RDY and not _target_in_melee);
 
-	ConRO:AbilityBurst(_AbominationLimb, _AbominationLimb_RDY and _in_combat and ConRO:BurstMode(_AbominationLimb, 120));
 	ConRO:AbilityBurst(_Bonestorm, _Bonestorm_RDY and _RunicPower >= 10 and _enemies_in_melee >= 3 and ConRO:BurstMode(_Bonestorm, 60));
 	ConRO:AbilityBurst(_RaiseDead, _RaiseDead_RDY and not _Pet_summoned  and ConRO:BurstMode(_RaiseDead, 120));
 
@@ -221,12 +233,14 @@ function ConRO.DeathKnight.Blood(_, timeShift, currentSpell, gcd, tChosen, pvpCh
 					tinsert(ConRO.SuggestedSpells, _DeathsCaress);
 					_DeathsCaress_RDY = false;
 					_BloodPlague_DEBUFF = true;
+					_BoneShield_COUNT = _BoneShield_COUNT + 2
+					_BoneShield_DUR = 30
 					_Runes = _Runes - 1;
 					_Queue = _Queue + 1;
 					break;
 				end
 
-				if _DeathandDecay_RDY and _Runes >= 1 and not _DeathandDecay_BUFF then
+				if _DeathandDecay_RDY and _Runes >= 1 and not _DeathandDecay_BUFF and ConRO.lastSpellId ~= _DeathandDecay then
 					tinsert(ConRO.SuggestedSpells, _DeathandDecay);
 					_DeathandDecay_BUFF = true;
 					_Runes = _Runes - 1;
@@ -240,222 +254,249 @@ function ConRO.DeathKnight.Blood(_, timeShift, currentSpell, gcd, tChosen, pvpCh
 					_Queue = _Queue + 1;
 					break;
 				end
-
-				if _AbominationLimb_RDY and ConRO:FullMode(_AbominationLimb, 120) then
-					tinsert(ConRO.SuggestedSpells, _AbominationLimb);
-					_AbominationLimb_RDY = false;
-					_Queue = _Queue + 1;
-					break;
-				end
 			end
 
-			if _Marrowrend_RDY and _Runes >= 2 and (_BoneShield_COUNT <= 0 or _BoneShield_DUR < 1.5) then
-				tinsert(ConRO.SuggestedSpells, _Marrowrend);
-				_Runes = _Runes - 2;
-				_BoneShield_COUNT = _BoneShield_COUNT + 3;
-				_BoneShield_DUR = 30;
-				_Queue = _Queue + 1;
-				break;
+			if _Marrowrend_RDY and _Runes >= 2 and (_BoneShield_COUNT < 5 or _BoneShield_DUR < 1.5) and _target_in_melee then
+				tinsert(ConRO.SuggestedSpells, _Marrowrend)
+				_BoneShield_COUNT = _BoneShield_COUNT + 3
+				_BoneShield_DUR = 30
+				_Runes = _Runes - 2
+				_RunicPower = _RunicPower + 20
+				_Queue = _Queue + 1
+				break
+			end
+
+			if _DeathsCaress_RDY and _Runes >= 1 and (_BoneShield_COUNT < 5 or _BoneShield_DUR < 1.5) and not _target_in_melee then
+				tinsert(ConRO.SuggestedSpells, _DeathsCaress)
+				_DeathsCaress_RDY = false
+				_BloodPlague_DEBUFF = true
+				_BoneShield_COUNT = _BoneShield_COUNT + 2
+				_BoneShield_DUR = 30
+				_Runes = _Runes - 1
+				_RunicPower = _RunicPower + 10
+				_Queue = _Queue + 1
+				break
 			end
 
 			if _Blooddrinker_RDY and not _DancingRuneWeapon_BUFF then
-				tinsert(ConRO.SuggestedSpells, _Blooddrinker);
-				_Blooddrinker_RDY = false;
-				_Queue = _Queue + 1;
-				break;
+				tinsert(ConRO.SuggestedSpells, _Blooddrinker)
+				_Blooddrinker_RDY = false
+				_Queue = _Queue + 1
+				break
 			end
 
-			if _DancingRuneWeapon_RDY and ConRO:HeroSpec(HeroSpec.Sanlayn) then
-				tinsert(ConRO.SuggestedSpells, _DancingRuneWeapon);
-				_DancingRuneWeapon_RDY = false;
-				_Queue = _Queue + 1;
-				break;
+			if _DeathandDecay_RDY and _Runes >= 1 and not _DeathandDecay_BUFF and ConRO.lastSpellId ~= _DeathandDecay then
+				tinsert(ConRO.SuggestedSpells, _DeathandDecay)
+				_DeathandDecay_RDY = false
+				_DeathandDecay_BUFF = true
+				_Runes = _Runes - 1
+				_RunicPower = _RunicPower + 10
+				_Queue = _Queue + 1
+				break
 			end
 
-			if _Marrowrend_RDY and _Runes >= 1 and (_Exterminate_COUNT >= 2 or (_Exterminate_COUNT >= 1 and _ReapersMark_CD < 15)) then
-				tinsert(ConRO.SuggestedSpells, _Marrowrend);
-				_Exterminate_COUNT = _Exterminate_COUNT - 1;
-				_Runes = _Runes - 1;
-				_BoneShield_COUNT = _BoneShield_COUNT + 3;
-				_Queue = _Queue + 1;
-				break;
+			if _DancingRuneWeapon_BUFF then
+				if _Bonestorm_RDY and _BoneShield_COUNT > 5 and _DeathandDecay_BUFF and ConRO:FullMode(_Bonestorm) then
+					tinsert(ConRO.SuggestedSpells, _Bonestorm)
+					_Bonestorm_RDY = false
+					_BoneShield_COUNT = _BoneShield_COUNT - 5
+					_Queue = _Queue + 1
+					break
+				end
+
+				if _BloodBoil_RDY and _enemies_in_10yrds >= 1 and _BloodBoil_CHARGES >= 1 and not blood_plague_SPREAD then
+					tinsert(ConRO.SuggestedSpells, _BloodBoil)
+					blood_plague_SPREAD = true
+					_BloodBoil_CHARGES = _BloodBoil_CHARGES - 1
+					_Queue = _Queue + 1
+					break
+				end
+
+				if _HeartStrike_RDY and _Runes >= 1 then
+					tinsert(ConRO.SuggestedSpells, _HeartStrike)
+					_Runes = _Runes - 1
+					_RunicPower = _RunicPower + 10
+					_Queue = _Queue + 1
+					break
+				end
+
+				if _DeathStrike_RDY and _RunicPower >= 75 or _Coagulopathy_DUR <= 1.5 then
+					tinsert(ConRO.SuggestedSpells, _DeathStrike)
+					_RunicPower = _RunicPower - death_strike_COST
+					_Coagulopathy_DUR = 8
+					_Queue = _Queue + 1
+					break
+				end
+
+				if _Consumption_RDY then
+					tinsert(ConRO.SuggestedSpells, _Consumption)
+					_Consumption_RDY = false
+					_Runes = _Runes + 2
+					_RunicPower = _RunicPower + 20
+					_Queue = _Queue + 1
+					break
+				end
+
+				if _BloodBoil_RDY and _enemies_in_10yrds >= 1 and _BloodBoil_CHARGES >= 1 then
+					tinsert(ConRO.SuggestedSpells, _BloodBoil)
+					blood_plague_SPREAD = true
+					_BloodBoil_CHARGES = _BloodBoil_CHARGES - 1
+					_Queue = _Queue + 1
+					break
+				end
+			else
+				if _Marrowrend_RDY and _Runes >= 1 and exterminate_COUNT >= 1 and _ReapersMark_CD < 15 then
+					tinsert(ConRO.SuggestedSpells, _Marrowrend)
+					exterminate_COUNT = exterminate_COUNT - 1
+					_Runes = _Runes - 1
+					_BoneShield_COUNT = _BoneShield_COUNT + 3
+					_BoneShield_DUR = 30
+					_Queue = _Queue + 1
+					break
+				end
+
+				if _ReapersMark_RDY and not _ReapersMark_DEBUFF and ConRO:HeroSpec(HeroSpec.Deathbringer) then
+					tinsert(ConRO.SuggestedSpells, _ReapersMark);
+					_ReapersMark_RDY = false;
+					_ReapersMark_BUFF = true;
+					_Queue = _Queue + 1;
+					break;
+				end
+
+				if _SoulReaper_RDY and ((_Runes >= 1 and _Target_Percent_Health <= 35) or _ReaperofSouls_BUFF) then
+					tinsert(ConRO.SuggestedSpells, _SoulReaper)
+					_SoulReaper_RDY = false
+					if _ReaperofSouls_BUFF then
+						_ReaperofSouls_BUFF = false
+					else
+						_Runes = _Runes - 1
+						_RunicPower = _RunicPower + 10
+					end
+					_Queue = _Queue + 1
+					break
+				end
+
+				if _DancingRuneWeapon_RDY and ConRO:HeroSpec(HeroSpec.Sanlayn) then
+					tinsert(ConRO.SuggestedSpells, _DancingRuneWeapon)
+					_DancingRuneWeapon_RDY = false
+					_Queue = _Queue + 1
+					break
+				end
+
+				if _Tombstone_RDY and _BoneShield_COUNT > 5 and _DancingRuneWeapon_CD > 25 and _DeathandDecay_BUFF and ConRO:FullMode(_Tombstone) then
+					tinsert(ConRO.SuggestedSpells, _Tombstone)
+					_Tombstone_RDY = false
+					_BoneShield_COUNT = _BoneShield_COUNT - 5
+					_RunicPower = _RunicPower + 30
+					_Queue = _Queue + 1
+					break
+				end
+
+				if _Bonestorm_RDY and _BoneShield_COUNT > 5 and _DancingRuneWeapon_CD > 15 and _DeathandDecay_BUFF and ConRO:FullMode(_Bonestorm) then
+					tinsert(ConRO.SuggestedSpells, _Bonestorm)
+					_Bonestorm_RDY = false
+					_BoneShield_COUNT = _BoneShield_COUNT - 5
+					_Queue = _Queue + 1
+					break
+				end
+
+				if _DeathStrike_RDY and _RunicPower >= 75 or _Coagulopathy_DUR <= 1.5 then
+					tinsert(ConRO.SuggestedSpells, _DeathStrike)
+					_RunicPower = _RunicPower - death_strike_COST
+					_Coagulopathy_DUR = 8
+					_Queue = _Queue + 1
+					break
+				end
+
+				if _HeartStrike_RDY and _Runes >= 1 and (infliction_of_sorrow_BUFF or ConRO:IsOverride(_HeartStrike) == Ability.VampiricStrike.spellID) then
+					tinsert(ConRO.SuggestedSpells, _HeartStrike)
+					infliction_of_sorrow_BUFF = false
+					_Runes = _Runes - 1
+					_RunicPower = _RunicPower + 10
+					_Queue = _Queue + 1
+					break
+				end
+
+				if _Consumption_RDY and _Runes <= 4 then
+					tinsert(ConRO.SuggestedSpells, _Consumption)
+					_Consumption_RDY = false
+					_Runes = _Runes + 2
+					_RunicPower = _RunicPower + 20
+					_Queue = _Queue + 1
+					break
+				end
+
+				if _BloodBoil_RDY and _enemies_in_10yrds >= 1 and (_BloodBoil_CHARGES >= 2 or (_BloodBoil_CHARGES >= 1 and not blood_plague_SPREAD)) then
+					tinsert(ConRO.SuggestedSpells, _BloodBoil)
+					blood_plague_SPREAD = true
+					_BloodBoil_CHARGES = _BloodBoil_CHARGES - 1
+					_Queue = _Queue + 1
+					break
+				end
+
+				if _HeartStrike_RDY and _Runes > 3 then
+					tinsert(ConRO.SuggestedSpells, _HeartStrike)
+					_Runes = _Runes - 1
+					_RunicPower = _RunicPower + 10
+					_Queue = _Queue + 1
+					break
+				end
 			end
 
-			if _ReapersMark_RDY and not _ReapersMark_DEBUFF and ConRO:HeroSpec(HeroSpec.Deathbringer) then
-				tinsert(ConRO.SuggestedSpells, _ReapersMark);
-				_ReapersMark_RDY = false;
-				_ReapersMark_BUFF = true;
-				_Queue = _Queue + 1;
-				break;
-			end
-
-			if _SoulReaper_RDY and _ReaperofSouls_BUFF then
-				tinsert(ConRO.SuggestedSpells, _SoulReaper);
-				_SoulReaper_RDY = false;
-				_ReaperofSouls_BUFF = false;
-				_Queue = _Queue + 1;
-				break;
-			end
-
-			if _Marrowrend_RDY and _Runes >= 1 and _Exterminate_COUNT >= 1 and not _ReapersMark_DEBUFF then
-				tinsert(ConRO.SuggestedSpells, _Marrowrend);
-				_Exterminate_COUNT = _Exterminate_COUNT - 1;
-				_Runes = _Runes - 1;
-				_BoneShield_COUNT = _BoneShield_COUNT + 3;
-				_Queue = _Queue + 1;
-				break;
-			end
-
-			if _AbominationLimb_RDY and not _DancingRuneWeapon_BUFF and ConRO:FullMode(_AbominationLimb) then
-				tinsert(ConRO.SuggestedSpells, _AbominationLimb);
-				_AbominationLimb_RDY = false;
-				_Queue = _Queue + 1;
-				break;
-			end
-
-			if _Bonestorm_RDY and _BoneShield_COUNT >= 5 and not _DancingRuneWeapon_RDY and _DeathandDecay_BUFF and ConRO:FullMode(_Bonestorm) then
-				tinsert(ConRO.SuggestedSpells, _Bonestorm);
-				_Bonestorm_RDY = false;
-				_BoneShield_COUNT = _BoneShield_COUNT - 5;
-				_Queue = _Queue + 1;
-				break;
-			end
-
-			if _Consumption_RDY and _DancingRuneWeapon_CD > 20 then
-				tinsert(ConRO.SuggestedSpells, _Consumption);
-				_Consumption_RDY = false;
-				_Queue = _Queue + 1;
-				break;
-			end
-
-			if _DeathandDecay_RDY and _Runes >= 1 and not _DeathandDecay_BUFF then
-				tinsert(ConRO.SuggestedSpells, _DeathandDecay);
-				_DeathandDecay_RDY = false;
-				_DeathandDecay_BUFF = true;
-				_Runes = _Runes - 1;
-				_Queue = _Queue + 1;
-				break;
-			end
-
-			if _SoulReaper_RDY and _Runes >= 1 and _Target_Percent_Health <= 35 then
-				tinsert(ConRO.SuggestedSpells, _SoulReaper);
-				_SoulReaper_RDY = false;
-				_Runes = _Runes - 1;
-				_Queue = _Queue + 1;
-				break;
-			end
-
-			if _Marrowrend_RDY and _Runes >= 2 and _BoneShield_COUNT <= 4 then
-				tinsert(ConRO.SuggestedSpells, _Marrowrend);
-				_Runes = _Runes - 2;
-				_BoneShield_COUNT = _BoneShield_COUNT + 3;
-				_Queue = _Queue + 1;
-				break;
-			end
-
-			if _DancingRuneWeapon_RDY then
-				tinsert(ConRO.SuggestedSpells, _DancingRuneWeapon);
-				_DancingRuneWeapon_RDY = false;
-				_Queue = _Queue + 1;
-				break;
-			end
-
-			if _Tombstone_RDY and _BoneShield_COUNT >= 5 and _DancingRuneWeapon_CD > 20 and _DeathandDecay_BUFF then
-				tinsert(ConRO.SuggestedSpells, _Tombstone);
-				_Tombstone_RDY = false;
-				_BoneShield_COUNT = _BoneShield_COUNT - 5;
-				_Queue = _Queue + 1;
-				break;
-			end
-
-			if _DeathStrike_RDY and _RunicPower >= 75 and _Coagulopathy_DUR <= 1.5 then
-				tinsert(ConRO.SuggestedSpells, _DeathStrike);
-				_RunicPower = _RunicPower - 40;
-				_Coagulopathy_DUR = 8;
-				_Queue = _Queue + 1;
-				break;
-			end
-
-			if _BloodBoil_RDY and _BloodBoil_CHARGES >= 2 then
-				tinsert(ConRO.SuggestedSpells, _BloodBoil);
-				_BloodBoil_CHARGES = _BloodBoil_CHARGES - 1;
-				_Queue = _Queue + 1;
-				break;
-			end
-
-			if _HeartStrike_RDY and _Runes > 3 then
-				tinsert(ConRO.SuggestedSpells, _HeartStrike);
-				_Runes = _Runes - 1;
-				_Queue = _Queue + 1;
-				break;
-			end
-
-			if _BloodBoil_RDY and _BloodBoil_CHARGES >= 1 then
-				tinsert(ConRO.SuggestedSpells, _BloodBoil);
-				_BloodBoil_CHARGES = _BloodBoil_CHARGES - 1;
-				_Queue = _Queue + 1;
-				break;
-			end
-
-			tinsert(ConRO.SuggestedSpells, 6603); --Waiting Spell Icon
-			_Queue = _Queue + 3;
-			break;
+			tinsert(ConRO.SuggestedSpells, 6603) --Waiting Spell Icon
+			_Queue = _Queue + 3
+			break
 		end
-	until _Queue >= 3;
-return nil;
+	until _Queue >= 3
+	return nil
 end
 
 function ConRO.DeathKnight.BloodDef(_, timeShift, currentSpell, gcd, tChosen, pvpChosen)
-	wipe(ConRO.SuggestedDefSpells);
-	ConRO:Stats();
+	wipe(ConRO.SuggestedDefSpells)
+	ConRO:Stats()
 
 --Abilities
-	local _DeathPact, _DeathPact_RDY = ConRO:AbilityReady(Ability.DeathPact, timeShift);
-	local _DeathStrike, _DeathStrike_RDY = ConRO:AbilityReady(Ability.DeathStrike, timeShift);
-	local _IceboundFortitude, _IceboundFortitude_RDY = ConRO:AbilityReady(Ability.IceboundFortitude, timeShift);
-	local _Lichborne, _Lichborne_RDY = ConRO:AbilityReady(Ability.Lichborne, timeShift);
-		local _Lichborne_BUFF = ConRO:Aura(Buff.Lichborne, timeShift);
-	local _RaiseDead, _RaiseDead_RDY, _RaiseDead_CD = ConRO:AbilityReady(Ability.RaiseDead, timeShift);
-	local _RuneTap, _RuneTap_RDY = ConRO:AbilityReady(Ability.RuneTap, timeShift);
-		local _RuneTap_BUFF	= ConRO:Aura(Buff.RuneTap, timeShift);
-	local _SacrificialPact, _SacrificialPact_RDY = ConRO:AbilityReady(Ability.SacrificialPact, timeShift);
-	local _VampiricBlood, _VampiricBlood_RDY = ConRO:AbilityReady(Ability.VampiricBlood, timeShift);
+	local _DeathPact, _DeathPact_RDY = ConRO:AbilityReady(Ability.DeathPact, timeShift)
+	local _DeathStrike, _DeathStrike_RDY = ConRO:AbilityReady(Ability.DeathStrike, timeShift)
+	local _IceboundFortitude, _IceboundFortitude_RDY = ConRO:AbilityReady(Ability.IceboundFortitude, timeShift)
+	local _Lichborne, _Lichborne_RDY = ConRO:AbilityReady(Ability.Lichborne, timeShift)
+	local _RuneTap, _RuneTap_RDY = ConRO:AbilityReady(Ability.RuneTap, timeShift)
+		local _RuneTap_BUFF	= ConRO:Aura(Buff.RuneTap, timeShift)
+	local _SacrificialPact, _SacrificialPact_RDY = ConRO:AbilityReady(Ability.SacrificialPact, timeShift)
+	local _VampiricBlood, _VampiricBlood_RDY = ConRO:AbilityReady(Ability.VampiricBlood, timeShift)
 
 --Conditions
 
 --Rotations
-	if _DeathStrike_RDY and _Player_Percent_Health <= 30 then
-		tinsert(ConRO.SuggestedDefSpells, _DeathStrike);
+	if _DeathStrike_RDY and _Player_Percent_Health <= 40 then
+		tinsert(ConRO.SuggestedDefSpells, _DeathStrike)
 	end
 
 	if _Lichborne_RDY and _Player_Percent_Health <= 40 then
-		tinsert(ConRO.SuggestedDefSpells, _Lichborne);
+		tinsert(ConRO.SuggestedDefSpells, _Lichborne)
 	end
 
 	if _DeathPact_RDY and _Player_Percent_Health <= 50 then
-		tinsert(ConRO.SuggestedDefSpells, _DeathPact);
+		tinsert(ConRO.SuggestedDefSpells, _DeathPact)
 	end
 
 	if _VampiricBlood_RDY and _Player_Percent_Health <= 50 then
-		tinsert(ConRO.SuggestedDefSpells, _VampiricBlood);
-	end
-
-	if _RaiseDead_RDY and _Player_Percent_Health <= 50 and tChosen[Ability.SacrificialPact.talentID] then
-		tinsert(ConRO.SuggestedDefSpells, _RaiseDead);
+		tinsert(ConRO.SuggestedDefSpells, _VampiricBlood)
 	end
 
 	if _SacrificialPact_RDY and _Player_Percent_Health <= 70 then
-		tinsert(ConRO.SuggestedDefSpells, _SacrificialPact);
+		tinsert(ConRO.SuggestedDefSpells, _SacrificialPact)
 	end
 
 	if _RuneTap_RDY and not _RuneTap_BUFF then
-		tinsert(ConRO.SuggestedDefSpells, _RuneTap);
+		tinsert(ConRO.SuggestedDefSpells, _RuneTap)
 	end
 
 	if _IceboundFortitude_RDY then
-		tinsert(ConRO.SuggestedDefSpells, _IceboundFortitude);
+		tinsert(ConRO.SuggestedDefSpells, _IceboundFortitude)
 	end
-return nil;
+
+	return nil
 end
 
 function ConRO.DeathKnight.Frost(_, timeShift, currentSpell, gcd, tChosen, pvpChosen)
@@ -463,35 +504,30 @@ function ConRO.DeathKnight.Frost(_, timeShift, currentSpell, gcd, tChosen, pvpCh
 	ConRO:Stats();
 
 --Abilities
-	local _AbominationLimb, _AbominationLimb_RDY = ConRO:AbilityReady(Ability.AbominationLimb, timeShift);
 	local _Asphyxiate, _Asphyxiate_RDY = ConRO:AbilityReady(Ability.Asphyxiate, timeShift);
 	local _BreathofSindragosa, _BreathofSindragosa_RDY, _BreathofSindragosa_CD = ConRO:AbilityReady(Ability.BreathofSindragosa, timeShift);
 		local _BreathofSindragosa_FORM = ConRO:Form(Buff.BreathofSindragosa);
 	local _ChainsofIce, _ChainsofIce_RDY = ConRO:AbilityReady(Ability.ChainsofIce, timeShift);
 		local _, _ColdHeart_COUNT = ConRO:Form(Buff.ColdHeart);
-	local _ChillStreak, _ChillStreak_RDY = ConRO:AbilityReady(Ability.ChillStreak, timeShift);
 	local _DeathandDecay, _DeathandDecay_RDY = ConRO:AbilityReady(Ability.DeathandDecay, timeShift);
 		local _DeathandDecay_BUFF = ConRO:Aura(Buff.DeathandDecay, timeShift);
 		local _DeathandDecay_CHARGES = ConRO:SpellCharges(_DeathandDecay);
 	local _DeathGrip, _DeathGrip_RDY = ConRO:AbilityReady(Ability.DeathGrip, timeShift);
 	local _DeathsAdvance, _DeathsAdvance_RDY = ConRO:AbilityReady(Ability.DeathsAdvance, timeShift);
 	local _EmpowerRuneWeapon, _EmpowerRuneWeapon_RDY = ConRO:AbilityReady(Ability.EmpowerRuneWeapon, timeShift);
-		local _UnholyStrength_BUFF = ConRO:Aura(Buff.UnholyStrength, timeShift);
-		local _, _RazorIce_COUNT	= ConRO:TargetAura(Debuff.RazorIce, timeShift);
+		local empower_rune_weapon_CHARGES, _, empower_rune_weapon_CCD = ConRO:SpellCharges(_EmpowerRuneWeapon);
 	local _Frostscythe, _Frostscythe_RDY = ConRO:AbilityReady(Ability.Frostscythe, timeShift);
 	local _FrostStrike, _FrostStrike_RDY = ConRO:AbilityReady(Ability.FrostStrike, timeShift);
-		local _FrostStrike_COST = 30;
+	local frost_strike_SB, frost_strike_SB_RDY = ConRO:AbilityReady(Ability.FrostStrike, timeShift);
 		local _, _, _IcyTalons_DUR = ConRO:Aura(Buff.IcyTalons, timeShift);
-		local _, _, _UnleashedFrenzy_DUR = ConRO:Aura(Buff.UnleashedFrenzy, timeShift);
 	local _FrostwyrmsFury, _FrostwyrmsFury_RDY, _FrostwyrmsFury_CD = ConRO:AbilityReady(Ability.FrostwyrmsFury, timeShift);
-	local _GlacialAdvance, _GlacialAdvance_RDY = ConRO:AbilityReady(Ability.GlacialAdvance, timeShift);
-	local _HornofWinter, _HornofWinter_RDY = ConRO:AbilityReady(Ability.HornofWinter, timeShift);
+	local glacial_advance, glacial_advance_RDY = ConRO:AbilityReady(Ability.glacial_advance, timeShift);
 	local _HowlingBlast, _HowlingBlast_RDY = ConRO:AbilityReady(Ability.HowlingBlast, timeShift);
 		local _FrostFever_DEBUFF = ConRO:TargetAura(Debuff.FrostFever, timeShift);
 		local _Rime_BUFF = ConRO:Aura(Buff.Rime, timeShift);
 	local _MindFreeze, _MindFreeze_RDY = ConRO:AbilityReady(Ability.MindFreeze, timeShift);
 	local _Obliterate, _Obliterate_RDY = ConRO:AbilityReady(Ability.Obliterate, timeShift);
-		local _Obliterate_COST = 2;
+		local obliterate_COST = 2;
 		local _KillingMachine_BUFF, _KillingMachine_COUNT = ConRO:Aura(Buff.KillingMachine, timeShift);
 	local _PillarofFrost, _PillarofFrost_RDY, _PillarofFrost_CD = ConRO:AbilityReady(Ability.PillarofFrost, timeShift);
 		local _PillarofFrost_BUFF, _, _PillarofFrost_DUR = ConRO:Aura(Buff.PillarofFrost, timeShift);
@@ -499,12 +535,28 @@ function ConRO.DeathKnight.Frost(_, timeShift, currentSpell, gcd, tChosen, pvpCh
 	local _RaiseDead, _RaiseDead_RDY = ConRO:AbilityReady(Ability.RaiseDead, timeShift);
 	local _ReapersMark, _ReapersMark_RDY = ConRO:AbilityReady(Ability.ReapersMark, timeShift);
 	local _RemorselessWinter, _RemorselessWinter_RDY = ConRO:AbilityReady(Ability.RemorselessWinter, timeShift);
-		local _RemorselessWinter_COST = 1;
 	local _WraithWalk, _WraithWalk_RDY = ConRO:AbilityReady(Ability.WraithWalk, timeShift);
 
+--Auras
+	local exterminate_BUFF = ConRO:Aura(Buff.exterminate, timeShift)
+	local _, razor_ice_COUNT = ConRO:TargetAura(Debuff.razor_ice, timeShift)
+	local reaper_of_souls_BUFF = ConRO:Aura(Buff.reaper_of_souls, timeShift)
+	local _UnholyStrength_BUFF = ConRO:Aura(Buff.UnholyStrength, timeShift)
+
 --Conditions
-	if tChosen[Ability.Icecap.talentID] then
-		_PillarofFrost_THRESHOLD = 30;
+	local no_razor_ice = true
+
+	if ConRO:HasEnchant(Runeforge.rune_of_razorice) or tChosen[Ability.Avalanche.talentID] or tChosen[Ability.ArcticAssault.talentID] then
+		no_razor_ice = false
+	end
+
+	if exterminate_BUFF then
+		obliterate_COST = 1;
+	end
+
+	if ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 3) or ConRO_AoEButton:IsVisible()) then
+		_Obliterate, _Obliterate_RDY = _Frostscythe, _Frostscythe_RDY
+		_FrostStrike, _FrostStrike_RDY = glacial_advance, glacial_advance_RDY
 	end
 
 --Indicators
@@ -517,567 +569,169 @@ function ConRO.DeathKnight.Frost(_, timeShift, currentSpell, gcd, tChosen, pvpCh
 
 	ConRO:AbilityPurge(_ArcaneTorrent, _ArcaneTorrent_RDY and _target_in_melee and ConRO:Purgable());
 
-	ConRO:AbilityBurst(_AbominationLimb, _AbominationLimb_RDY and _FrostFever_DEBUFF and ConRO:BurstMode(_AbominationLimb));
-	ConRO:AbilityBurst(_BreathofSindragosa, _BreathofSindragosa_RDY and _RunicPower >= 60 and _PillarofFrost_RDY and ConRO:BurstMode(_BreathofSindragosa));
-	ConRO:AbilityBurst(_EmpowerRuneWeapon, _EmpowerRuneWeapon_RDY and _PillarofFrost_RDY and _Runes < 6 and not tChosen[Ability.BreathofSindragosa.talentID] and ConRO:BurstMode(_EmpowerRuneWeapon));
-	ConRO:AbilityBurst(_FrostwyrmsFury, _FrostwyrmsFury_RDY and ((_PillarofFrost_BUFF and _UnholyStrength_BUFF) or _PillarofFrost_DUR <= 5));
-	ConRO:AbilityBurst(_PillarofFrost, _PillarofFrost_RDY and (not tChosen[Ability.BreathofSindragosa.talentID] or (tChosen[Ability.BreathofSindragosa.talentID] and ((_BreathofSindragosa_CD >= _PillarofFrost_THRESHOLD) or _BreathofSindragosa_FORM))) and ConRO:BurstMode(_PillarofFrost));
-	ConRO:AbilityBurst(_RaiseDead, _RaiseDead_RDY and not _Pet_summoned and _PillarofFrost_BUFF);
+	ConRO:AbilityBurst(_BreathofSindragosa, _BreathofSindragosa_RDY and _RunicPower >= 60 and _PillarofFrost_RDY and ConRO:BurstMode(_BreathofSindragosa))
+	ConRO:AbilityBurst(_FrostwyrmsFury, _FrostwyrmsFury_RDY and ((ConRO:HeroSpec(HeroSpec.RideroftheApocalypse) and _PillarofFrost_BUFF) or (_PillarofFrost_BUFF and _UnholyStrength_BUFF) or _PillarofFrost_DUR <= 5) and ConRO:BurstMode(_FrostwyrmsFury))
+	ConRO:AbilityBurst(_PillarofFrost, _PillarofFrost_RDY and (not tChosen[Ability.BreathofSindragosa.talentID] or (tChosen[Ability.BreathofSindragosa.talentID] and ((_BreathofSindragosa_CD >= _PillarofFrost_THRESHOLD) or _BreathofSindragosa_FORM))) and ConRO:BurstMode(_PillarofFrost))
+	ConRO:AbilityBurst(_RaiseDead, _RaiseDead_RDY and not _Pet_summoned and _PillarofFrost_BUFF)
 
 --Rotations
 	repeat
 		while(true) do
 			if not _in_combat then
-				if _AbominationLimb_RDY and ConRO:FullMode(_AbominationLimb) then
-					tinsert(ConRO.SuggestedSpells, _AbominationLimb);
-					_AbominationLimb_RDY = false;
-					_Queue = _Queue + 1;
-					break;
+				if _RemorselessWinter_RDY and _Runes >= 1 and not tChosen[Ability.FrozenDominion.talentID] then
+					tinsert(ConRO.SuggestedSpells, _RemorselessWinter)
+					_RemorselessWinter_RDY = false
+					_Runes = _Runes - 1
+					_RunicPower = _RunicPower + 10
+					_Queue = _Queue + 1
+					break
 				end
 
-				if _RemorselessWinter_RDY and _Runes >= _RemorselessWinter_COST then
-					tinsert(ConRO.SuggestedSpells, _RemorselessWinter);
-					_RemorselessWinter_RDY = false;
-					_Runes = _Runes - _RemorselessWinter_COST;
-					_Queue = _Queue + 1;
-					break;
+				if _Obliterate_RDY and _Runes >= obliterate_COST then
+					tinsert(ConRO.SuggestedSpells, _Obliterate)
+					_KillingMachine_COUNT = _KillingMachine_COUNT - 1
+					_Runes = _Runes - obliterate_COST
+					_RunicPower = _RunicPower + (10 * obliterate_COST)
+					_Queue = _Queue + 1
+					break
 				end
 
-				if _ChillStreak_RDY and _Runes >= 1 then
-					tinsert(ConRO.SuggestedSpells, _ChillStreak);
-					_ChillStreak_RDY = false;
-					_Runes = _Runes - 1;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _Obliterate_RDY and _Runes >= _Obliterate_COST then
-					tinsert(ConRO.SuggestedSpells, _Obliterate);
-					_KillingMachine_COUNT = _KillingMachine_COUNT - 1;
-					_Runes = _Runes - _Obliterate_COST;
-					_Queue = _Queue + 1;
-					break;
+				if _EmpowerRuneWeapon_RDY and _RunicPower <= 60 then
+					tinsert(ConRO.SuggestedSpells, _EmpowerRuneWeapon)
+					_EmpowerRuneWeapon_RDY = false
+					empower_rune_weapon_CHARGES = empower_rune_weapon_CHARGES - 1
+					_RunicPower = _RunicPower + 40
+					_Queue = _Queue + 1
+					break
 				end
 			end
 
-			if tChosen[Ability.ColdHeart.talentID] and _ChainsofIce_RDY and _ColdHeart_COUNT >= 20 and _KillingMachine_BUFF and _RazorIce_COUNT >= 5 then
-				tinsert(ConRO.SuggestedSpells, _ChainsofIce);
-				_ChillStreak_RDY = false;
-				_Queue = _Queue + 1;
-				break;
+			if _RemorselessWinter_RDY and _Runes >= 1 and not tChosen[Ability.FrozenDominion.talentID] and (tChosen[Ability.GatheringStorm.talentID] or ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 3) or ConRO_AoEButton:IsVisible())) then
+				tinsert(ConRO.SuggestedSpells, _RemorselessWinter)
+				_RemorselessWinter_RDY = false
+				_Runes = _Runes - 1
+				_RunicPower = _RunicPower + 10
+				_Queue = _Queue + 1
+				break
 			end
 
-			if _BreathofSindragosa_RDY and _RunicPower >= 60 and ConRO:FullMode(_BreathofSindragosa) then
-				tinsert(ConRO.SuggestedSpells, _BreathofSindragosa);
-				_BreathofSindragosa_RDY = false;
-				_BreathofSindragosa_FORM = true;
-				_Runes = _Runes + 2;
-				_Queue = _Queue + 1;
-				break;
+			if _EmpowerRuneWeapon_RDY and (empower_rune_weapon_CHARGES >= 2 or (empower_rune_weapon_CHARGES >= 1 and empower_rune_weapon_CCD < 5)) then
+				tinsert(ConRO.SuggestedSpells, _EmpowerRuneWeapon)
+				_EmpowerRuneWeapon_RDY = false
+				empower_rune_weapon_CHARGES = empower_rune_weapon_CHARGES - 1
+				_RunicPower = _RunicPower + 40
+				_Queue = _Queue + 1
+				break
 			end
 
-			if tChosen[Ability.BreathofSindragosa.talentID] and _BreathofSindragosa_FORM then
-				if _PillarofFrost_RDY and ConRO:FullMode(_PillarofFrost) then
-					tinsert(ConRO.SuggestedSpells, _PillarofFrost);
-					_PillarofFrost_RDY = false;
-					_Queue = _Queue + 1;
-					break;
-				end
+			if _PillarofFrost_RDY and ConRO:FullMode(_PillarofFrost) then
+				tinsert(ConRO.SuggestedSpells, _PillarofFrost)
+				_PillarofFrost_RDY = false
+				_PillarofFrost_BUFF = true
+				_Queue = _Queue + 1
+				break
+			end
 
-				if _EmpowerRuneWeapon_RDY and ((_Runes <= 3 and _RunicPower <= 70) or _RunicPower <= 40) and ConRO:FullMode(_EmpowerRuneWeapon) then
-					tinsert(ConRO.SuggestedSpells, _EmpowerRuneWeapon);
-					_EmpowerRuneWeapon_RDY = false;
-					_Runes = _Runes + 1;
-					_RunicPower = _RunicPower + 5;
-					_Queue = _Queue + 1;
-					break;
-				end
+			if _ReapersMark_RDY and _Runes >= 2 and _PillarofFrost_BUFF and ConRO:HeroSpec(HeroSpec.Deathbringer) then
+				tinsert(ConRO.SuggestedSpells, _ReapersMark)
+				_ReapersMark_RDY = false
+				_Runes = _Runes - 2
+				_RunicPower = _RunicPower + 20
+				_Queue = _Queue + 1
+				break
+			end
 
-				if _RemorselessWinter_RDY and _Runes >= _RemorselessWinter_COST then
-					tinsert(ConRO.SuggestedSpells, _RemorselessWinter);
-					_RemorselessWinter_RDY = false;
-					_Runes = _Runes - _RemorselessWinter_COST;
-					_Queue = _Queue + 1;
-					break;
-				end
+			if _BreathofSindragosa_RDY and _RunicPower >= 60 and _PillarofFrost_BUFF and ConRO:FullMode(_BreathofSindragosa) then
+				tinsert(ConRO.SuggestedSpells, _BreathofSindragosa)
+				_BreathofSindragosa_RDY = false
+				_KillingMachine_COUNT = _KillingMachine_COUNT - 1
+				_Queue = _Queue + 1
+				break
+			end
 
-				if _ChillStreak_RDY and _Runes >= 1 then
-					tinsert(ConRO.SuggestedSpells, _ChillStreak);
-					_ChillStreak_RDY = false;
-					_Runes = _Runes - 1;
-					_Queue = _Queue + 1;
-					break;
-				end
+			if _FrostwyrmsFury_RDY and ((ConRO:HeroSpec(HeroSpec.RideroftheApocalypse) and _PillarofFrost_BUFF) or (_PillarofFrost_BUFF and _UnholyStrength_BUFF) or (_PillarofFrost_BUFF and _PillarofFrost_DUR <= 3)) and ConRO:FullMode(_FrostwyrmsFury) then
+				tinsert(ConRO.SuggestedSpells, _FrostwyrmsFury)
+				_FrostwyrmsFury_RDY = false
+				_Queue = _Queue + 1
+				break
+			end
 
-				if _ReapersMark_RDY and _Runes >= 2 and ConRO:HeroSpec(HeroSpec.Deathbringer) then
-					tinsert(ConRO.SuggestedSpells, _ReapersMark);
-					_ReapersMark_RDY = false;
-					_Runes = _Runes - 2;
-					_Queue = _Queue + 1;
-					break;
-				end
+			if _Obliterate_RDY and _Runes >= obliterate_COST and (_KillingMachine_COUNT >= 2 or (_KillingMachine_COUNT >= 1 and _Runes >= 3)) then
+				tinsert(ConRO.SuggestedSpells, _Obliterate)
+				_KillingMachine_COUNT = _KillingMachine_COUNT - 1
+				_Runes = _Runes - obliterate_COST
+				_RunicPower = _RunicPower + (10 * obliterate_COST)
+				_Queue = _Queue + 1
+				break
+			end
 
-				if _DeathandDecay_RDY and not _DeathandDecay_BUFF and _Runes >= 1 and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 3) or ConRO_AoEButton:IsVisible()) then
-					tinsert(ConRO.SuggestedSpells, _DeathandDecay);
-					_DeathandDecay_RDY = false;
-					_Runes = _Runes - 1;
-					_Queue = _Queue + 1;
-					break;
-				end
+			if _HowlingBlast_RDY and _Rime_BUFF then
+				tinsert(ConRO.SuggestedSpells, _HowlingBlast)
+				_FrostFever_DEBUFF = true
+				_Rime_BUFF = false
+				_Queue = _Queue + 1
+				break
+			end
 
-				if _Obliterate_RDY and _Runes >= _Obliterate_COST and _KillingMachine_COUNT >= 2 and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee <= 1) or ConRO_SingleButton:IsVisible()) then
-					tinsert(ConRO.SuggestedSpells, _Obliterate);
-					_KillingMachine_COUNT = _KillingMachine_COUNT - 1;
-					_Runes = _Runes - _Obliterate_COST;
-					_Queue = _Queue + 1;
-					break;
-				end
+			if frost_strike_SB_RDY and _RunicPower >= 35 and razor_ice_COUNT >= 5 and tChosen[Ability.ShatteringBlade.talentID] then
+				tinsert(ConRO.SuggestedSpells, frost_strike_SB)
+				_RunicPower = _RunicPower - 35
+				_IcyTalons_DUR = 10
+				razor_ice_COUNT = 0
+				_Queue = _Queue + 1
+				break
+			end
 
-				if _SoulReaper_RDY and _Runes >= 1 and _Target_Percent_Health <= 36 and _RunicPower >= 50 and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee <= 1) or ConRO_SingleButton:IsVisible()) then
-					tinsert(ConRO.SuggestedSpells, _SoulReaper);
-					_SoulReaper_RDY = false;
-					_Runes = _Runes - 1;
-					_Queue = _Queue + 1;
-					break;
-				end
+			if _FrostStrike_RDY and _RunicPower >= 35 and not tChosen[Ability.ShatteringBlade.talentID] and tChosen[Ability.BreathofSindragosa.talentID] and _BreathofSindragosa_CD >= 3 then
+				tinsert(ConRO.SuggestedSpells, _FrostStrike)
+				_RunicPower = _RunicPower - 35
+				_IcyTalons_DUR = 10
+				razor_ice_COUNT = 0
+				_Queue = _Queue + 1
+				break
+			end
 
-				if _HowlingBlast_RDY and _Rime_BUFF and _RunicPower >= 60 then
-					tinsert(ConRO.SuggestedSpells, _HowlingBlast);
-					_FrostFever_DEBUFF = true;
-					_Rime_BUFF = false;
-					_Queue = _Queue + 1;
-					break;
-				end
+			if _Obliterate_RDY and _Runes >= obliterate_COST and (_KillingMachine_COUNT >= 1 and (not _ReapersMark_RDY or _ReapersMark_CD >= 5) or (_KillingMachine_COUNT == 0 and not tChosen[Ability.Obliteration.talentID])) then
+				tinsert(ConRO.SuggestedSpells, _Obliterate)
+				_KillingMachine_COUNT = _KillingMachine_COUNT - 1
+				_Runes = _Runes - obliterate_COST
+				_RunicPower = _RunicPower + (10 * obliterate_COST)
+				_Queue = _Queue + 1
+				break
+			end
 
-				if _Frostscythe_RDY and _Runes >= 2 and not _KillingMachine_BUFF then
-					tinsert(ConRO.SuggestedSpells, _Frostscythe);
-					_Frostscythe_RDY = false;
-					_Runes = _Runes - 2;
-					_Queue = _Queue + 1;
-					break;
-				end
+			if _EmpowerRuneWeapon_RDY and empower_rune_weapon_CHARGES >= 1 and _RunicPower < 60 then
+				tinsert(ConRO.SuggestedSpells, _EmpowerRuneWeapon)
+				_EmpowerRuneWeapon_RDY = false
+				empower_rune_weapon_CHARGES = empower_rune_weapon_CHARGES - 1
+				_RunicPower = _RunicPower + 40
+				_Queue = _Queue + 1
+				break
+			end
 
-				if _Obliterate_RDY and _Runes >= _Obliterate_COST and ((_KillingMachine_COUNT >= 1) or (_RunicPower <= _RunicPower_Max - 25)) then
-					tinsert(ConRO.SuggestedSpells, _Obliterate);
-					_KillingMachine_COUNT = _KillingMachine_COUNT - 1;
-					_Runes = _Runes - _Obliterate_COST;
-					_Queue = _Queue + 1;
-					break;
-				end
+			if _Obliterate_RDY and _Runes >= obliterate_COST and tChosen[Ability.Obliteration.talentID] and _KillingMachine_COUNT == 0 and not _PillarofFrost_BUFF then
+				tinsert(ConRO.SuggestedSpells, _Obliterate)
+				_KillingMachine_COUNT = _KillingMachine_COUNT - 1
+				_Runes = _Runes - obliterate_COST
+				_RunicPower = _RunicPower + (10 * obliterate_COST)
+				_Queue = _Queue + 1
+				break
+			end
 
-				if _HornofWinter_RDY and _Runes <= 4 and _RunicPower <= _RunicPower_Max - 25 and ConRO:FullMode(_HornofWinter) then
-					tinsert(ConRO.SuggestedSpells, _HornofWinter);
-					_HornofWinter_RDY = false;
-					_RunicPower = _RunicPower + 25;
-					_Runes = _Runes + 2;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _DeathandDecay_RDY and not _DeathandDecay_BUFF and _Runes >= 1 then
-					tinsert(ConRO.SuggestedSpells, _DeathandDecay);
-					_DeathandDecay_RDY = false;
-					_Runes = _Runes - 1;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _ArcaneTorrent_RDY and _RunicPower <= 60 then
-					tinsert(ConRO.SuggestedSpells, _ArcaneTorrent);
-					_ArcaneTorrent_RDY = false;
-					_RunicPower = _RunicPower + 20;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _AbominationLimb_RDY and ConRO:FullMode(_AbominationLimb) then
-					tinsert(ConRO.SuggestedSpells, _AbominationLimb);
-					_AbominationLimb_RDY = false;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-			elseif tChosen[Ability.Obliteration.talentID] and _PillarofFrost_BUFF then
-				if _ReapersMark_RDY and _Runes >= 2 and ConRO:HeroSpec(HeroSpec.Deathbringer) then
-					tinsert(ConRO.SuggestedSpells, _ReapersMark);
-					_ReapersMark_RDY = false;
-					_Runes = _Runes - 2;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _RunicPower >= _FrostStrike_COST and (tChosen[Ability.IcyTalons.talentID] and _IcyTalons_DUR <= 1) or (tChosen[Ability.UnleashedFrenzy.talentID] and _UnleashedFrenzy_DUR <= 1) then
-					if tChosen[Ability.GlacialAdvance.talentID] and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 3) or ConRO_AoEButton:IsVisible()) then
-						if _GlacialAdvance_RDY then
-							tinsert(ConRO.SuggestedSpells, _GlacialAdvance);
-							_GlacialAdvance_RDY = false;
-							_RunicPower = _RunicPower - _GlacialAdvance_COST;
-							_IcyTalons_DUR = 10;
-							_UnleashedFrenzy_DUR = 10;
-							_Queue = _Queue + 1;
-							break;
-						end
-					else
-						if _FrostStrike_RDY then
-							tinsert(ConRO.SuggestedSpells, _FrostStrike);
-							_FrostStrike_RDY = false;
-							_RunicPower = _RunicPower - _FrostStrike_COST;
-							_IcyTalons_DUR = 10;
-							_UnleashedFrenzy_DUR = 10;
-							_Queue = _Queue + 1;
-							break;
-						end
-					end
-				end
-
-				if _EmpowerRuneWeapon_RDY and not tChosen[Ability.BreathofSindragosa.talentID] and _Runes <= 3 and _RunicPower <= 70 and ConRO:FullMode(_EmpowerRuneWeapon) then
-					tinsert(ConRO.SuggestedSpells, _EmpowerRuneWeapon);
-					_EmpowerRuneWeapon_RDY = false;
-					_Runes = _Runes + 1;
-					_RunicPower = _RunicPower + 5;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _RemorselessWinter_RDY and _Runes >= _RemorselessWinter_COST and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 2) or ConRO_AoEButton:IsVisible()) then
-					tinsert(ConRO.SuggestedSpells, _RemorselessWinter);
-					_RemorselessWinter_RDY = false;
-					_Runes = _Runes - _RemorselessWinter_COST;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _DeathandDecay_RDY and not _DeathandDecay_BUFF and _Runes >= 1 and _KillingMachine_COUNT >= 1 and _PillarofFrost_DUR >= 5 and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 2) or ConRO_AoEButton:IsVisible()) then
-					tinsert(ConRO.SuggestedSpells, _DeathandDecay);
-					_DeathandDecay_RDY = false;
-					_Runes = _Runes - 1;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _Obliterate_RDY and _Runes >= _Obliterate_COST and _KillingMachine_COUNT >= 1 then
-					tinsert(ConRO.SuggestedSpells, _Obliterate);
-					_KillingMachine_COUNT = _KillingMachine_COUNT - 1;
-					_Runes = _Runes - _Obliterate_COST;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _SoulReaper_RDY and _Runes >= 3 and _Target_Percent_Health <= 36 and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee <= 1) or ConRO_SingleButton:IsVisible()) then
-					tinsert(ConRO.SuggestedSpells, _SoulReaper);
-					_SoulReaper_RDY = false;
-					_Runes = _Runes - 1;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _HowlingBlast_RDY and _Runes >= 1 and not _FrostFever_DEBUFF then
-					tinsert(ConRO.SuggestedSpells, _HowlingBlast);
-					_FrostFever_DEBUFF = true;
-					_Runes = _Runes - 1;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _GlacialAdvance_RDY and _RunicPower >= _FrostStrike_COST and _RazorIce_COUNT < 5 and tChosen[Ability.ShatteringBlade.talentID] then
-					tinsert(ConRO.SuggestedSpells, _GlacialAdvance);
-					_GlacialAdvance_RDY = false;
-					_RunicPower = _RunicPower - _FrostStrike_COST;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _FrostStrike_RDY and _RunicPower >= _FrostStrike_COST and _RazorIce_COUNT >= 5 and (tChosen[Ability.ShatteredFrost.talentID] or (ConRO_AutoButton:IsVisible() and _enemies_in_melee <= 1) or ConRO_SingleButton:IsVisible()) then
-					tinsert(ConRO.SuggestedSpells, _FrostStrike);
-					_RunicPower = _RunicPower - _FrostStrike_COST;
-					_IcyTalons_DUR = 10;
-					_UnleashedFrenzy_DUR = 10;
-					_RazorIce_COUNT = _RazorIce_COUNT - 5;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _RunicPower >= _FrostStrike_COST and _Runes < 2 then
-					if tChosen[Ability.GlacialAdvance.talentID] and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 3) or ConRO_AoEButton:IsVisible()) then
-						if _GlacialAdvance_RDY then
-							tinsert(ConRO.SuggestedSpells, _GlacialAdvance);
-							_GlacialAdvance_RDY = false;
-							_RunicPower = _RunicPower - _GlacialAdvance_COST;
-							_IcyTalons_DUR = 10;
-							_UnleashedFrenzy_DUR = 10;
-							_Queue = _Queue + 1;
-							break;
-						end
-					else
-						if _FrostStrike_RDY then
-							tinsert(ConRO.SuggestedSpells, _FrostStrike);
-							_FrostStrike_RDY = false;
-							_RunicPower = _RunicPower - _FrostStrike_COST;
-							_IcyTalons_DUR = 10;
-							_UnleashedFrenzy_DUR = 10;
-							_Queue = _Queue + 1;
-							break;
-						end
-					end
-				end
-
-				if _HowlingBlast_RDY and _Rime_BUFF then
-					tinsert(ConRO.SuggestedSpells, _HowlingBlast);
-					_FrostFever_DEBUFF = true;
-					_Rime_BUFF = false;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _RunicPower >= _FrostStrike_COST then
-					if tChosen[Ability.GlacialAdvance.talentID] and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 3) or ConRO_AoEButton:IsVisible()) then
-						if _GlacialAdvance_RDY then
-							tinsert(ConRO.SuggestedSpells, _GlacialAdvance);
-							_GlacialAdvance_RDY = false;
-							_RunicPower = _RunicPower - _GlacialAdvance_COST;
-							_IcyTalons_DUR = 10;
-							_UnleashedFrenzy_DUR = 10;
-							_Queue = _Queue + 1;
-							break;
-						end
-					else
-						if _FrostStrike_RDY then
-							tinsert(ConRO.SuggestedSpells, _FrostStrike);
-							_FrostStrike_RDY = false;
-							_RunicPower = _RunicPower - _FrostStrike_COST;
-							_IcyTalons_DUR = 10;
-							_UnleashedFrenzy_DUR = 10;
-							_Queue = _Queue + 1;
-							break;
-						end
-					end
-				end
-
-				if _HornofWinter_RDY and (not tChosen[Ability.BreathofSindragosa.talentID] or (tChosen[Ability.BreathofSindragosa.talentID] and _BreathofSindragosa_CD >= 35)) and ConRO:FullMode(_HornofWinter) then
-					tinsert(ConRO.SuggestedSpells, _HornofWinter);
-					_HornofWinter_RDY = false;
-					_RunicPower = _RunicPower + 25;
-					_Runes = _Runes + 2;
-					_Queue = _Queue + 1;
-					break;
-				end
-			else --Standard Rotation
-				if _RunicPower >= _FrostStrike_COST and (tChosen[Ability.IcyTalons.talentID] and _IcyTalons_DUR <= 1) or (tChosen[Ability.UnleashedFrenzy.talentID] and _UnleashedFrenzy_DUR <= 1) then
-					if tChosen[Ability.GlacialAdvance.talentID] and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 3) or ConRO_AoEButton:IsVisible()) then
-						if _GlacialAdvance_RDY then
-							tinsert(ConRO.SuggestedSpells, _GlacialAdvance);
-							_GlacialAdvance_RDY = false;
-							_RunicPower = _RunicPower - _FrostStrike_COST;
-							_IcyTalons_DUR = 10;
-							_UnleashedFrenzy_DUR = 10;
-							_Queue = _Queue + 1;
-							break;
-						end
-					else
-						if _FrostStrike_RDY then
-							tinsert(ConRO.SuggestedSpells, _FrostStrike);
-							_FrostStrike_RDY = false;
-							_RunicPower = _RunicPower - _FrostStrike_COST;
-							_IcyTalons_DUR = 10;
-							_UnleashedFrenzy_DUR = 10;
-							_Queue = _Queue + 1;
-							break;
-						end
-					end
-				end
-
-				if _AbominationLimb_RDY and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 3) or ConRO_AoEButton:IsVisible()) and ConRO:FullMode(_AbominationLimb) then
-					tinsert(ConRO.SuggestedSpells, _AbominationLimb);
-					_AbominationLimb_RDY = false;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _RemorselessWinter_RDY and _Runes >= _RemorselessWinter_COST and _PillarofFrost_CD > 17 then
-					tinsert(ConRO.SuggestedSpells, _RemorselessWinter);
-					_RemorselessWinter_RDY = false;
-					_Runes = _Runes - _RemorselessWinter_COST;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _ChillStreak_RDY and _Runes >= 1 then
-					tinsert(ConRO.SuggestedSpells, _ChillStreak);
-					_ChillStreak_RDY = false;
-					_Runes = _Runes - 1;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _DeathandDecay_RDY and not _DeathandDecay_BUFF and _Runes >= 3 and _ReapersMark_RDY and ConRO:HeroSpec(HeroSpec.Deathbringer) then
-					tinsert(ConRO.SuggestedSpells, _DeathandDecay);
-					_DeathandDecay_RDY = false;
-					_Runes = _Runes - 1;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _PillarofFrost_RDY and ConRO:FullMode(_PillarofFrost) then
-					tinsert(ConRO.SuggestedSpells, _PillarofFrost);
-					_PillarofFrost_RDY = false;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _ReapersMark_RDY and _Runes >= 2 and ConRO:HeroSpec(HeroSpec.Deathbringer) then
-					tinsert(ConRO.SuggestedSpells, _ReapersMark);
-					_ReapersMark_RDY = false;
-					_Runes = _Runes - 2;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _Frostscythe_RDY and _Runes >= 2 and not _KillingMachine_BUFF then
-					tinsert(ConRO.SuggestedSpells, _Frostscythe);
-					_Frostscythe_RDY = false;
-					_Runes = _Runes - 2;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _DeathandDecay_RDY and not _DeathandDecay_BUFF and _Runes >= 1 and (_DeathandDecay_CHARGES >= 2 or _PillarofFrost_CD >= 30) and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 2) or ConRO_AoEButton:IsVisible()) then
-					tinsert(ConRO.SuggestedSpells, _DeathandDecay);
-					_DeathandDecay_RDY = false;
-					_Runes = _Runes - 1;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _Obliterate_RDY and _Runes >= _Obliterate_COST and ((_KillingMachine_COUNT >= 2 and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee <= 1) or ConRO_SingleButton:IsVisible())) or (_KillingMachine_COUNT >= 1 and _DeathandDecay_BUFF and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 2) or ConRO_AoEButton:IsVisible()))) then
-					tinsert(ConRO.SuggestedSpells, _Obliterate);
-					_KillingMachine_COUNT = _KillingMachine_COUNT - 1;
-					_Runes = _Runes - _Obliterate_COST;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _FrostStrike_RDY and _RunicPower >= _FrostStrike_COST and ((_KillingMachine_BUFF and _Runes < 2) or (_RazorIce_COUNT >= 5 and tChosen[Ability.ShatteringBlade.talentID])) and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee <= 1) or ConRO_SingleButton:IsVisible()) then
-					tinsert(ConRO.SuggestedSpells, _FrostStrike);
-					_RunicPower = _RunicPower - _FrostStrike_COST;
-					_RazorIce_COUNT = _RazorIce_COUNT - 5;
-					_IcyTalons_DUR = 10;
-					_UnleashedFrenzy_DUR = 10;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _FrostStrike_RDY and _RunicPower >= _FrostStrike_COST and tChosen[Ability.ShatteredFrost.talentID] and _RazorIce_COUNT >= 5 and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 2) or ConRO_AoEButton:IsVisible()) then
-					tinsert(ConRO.SuggestedSpells, _FrostStrike);
-					_RunicPower = _RunicPower - _FrostStrike_COST;
-					_RazorIce_COUNT = _RazorIce_COUNT - 5;
-					_IcyTalons_DUR = 10;
-					_UnleashedFrenzy_DUR = 10;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _HowlingBlast_RDY and _Rime_BUFF and tChosen[Ability.Icebreaker.talentID] then
-					tinsert(ConRO.SuggestedSpells, _HowlingBlast);
-					_FrostFever_DEBUFF = true;
-					_Rime_BUFF = false;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _Obliterate_RDY and _Runes >= _Obliterate_COST and _KillingMachine_COUNT >= 1 and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee <= 1) or ConRO_SingleButton:IsVisible()) then
-					tinsert(ConRO.SuggestedSpells, _Obliterate);
-					_KillingMachine_COUNT = _KillingMachine_COUNT - 1;
-					_Runes = _Runes - _Obliterate_COST;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _SoulReaper_RDY and _Runes >= 3 and _Target_Percent_Health <= 36 and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee <= 1) or ConRO_SingleButton:IsVisible()) then
-					tinsert(ConRO.SuggestedSpells, _SoulReaper);
-					_SoulReaper_RDY = false;
-					_Runes = _Runes - 1;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _FrostStrike_RDY and _RunicPower >= _RunicPower_Max - 10 and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee <= 1) or ConRO_SingleButton:IsVisible()) then
-					tinsert(ConRO.SuggestedSpells, _FrostStrike);
-					_RunicPower = _RunicPower - _FrostStrike_COST;
-					_IcyTalons_DUR = 10;
-					_UnleashedFrenzy_DUR = 10;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _HowlingBlast_RDY and _Rime_BUFF then
-					tinsert(ConRO.SuggestedSpells, _HowlingBlast);
-					_FrostFever_DEBUFF = true;
-					_Rime_BUFF = false;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _Obliterate_RDY and _Runes >= _Obliterate_COST and _KillingMachine_COUNT >= 1 then
-					tinsert(ConRO.SuggestedSpells, _Obliterate);
-					_KillingMachine_COUNT = _KillingMachine_COUNT - 1;
-					_Runes = _Runes - _Obliterate_COST;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _RunicPower >= _FrostStrike_COST then
-					if tChosen[Ability.GlacialAdvance.talentID] and ((ConRO_AutoButton:IsVisible() and _enemies_in_melee >= 3) or ConRO_AoEButton:IsVisible()) then
-						if _GlacialAdvance_RDY then
-							tinsert(ConRO.SuggestedSpells, _GlacialAdvance);
-							_GlacialAdvance_RDY = false;
-							_RunicPower = _RunicPower - _FrostStrike_COST;
-							_IcyTalons_DUR = 10;
-							_UnleashedFrenzy_DUR = 10;
-							_Queue = _Queue + 1;
-							break;
-						end
-					else
-						if _FrostStrike_RDY and not tChosen[Ability.ShatteringBlade.talentID] then
-							tinsert(ConRO.SuggestedSpells, _FrostStrike);
-							_RunicPower = _RunicPower - _FrostStrike_COST;
-							_IcyTalons_DUR = 10;
-							_UnleashedFrenzy_DUR = 10;
-							_Queue = _Queue + 1;
-							break;
-						end
-					end
-				end
-
-				if _Obliterate_RDY and _Runes >= _Obliterate_COST then
-					tinsert(ConRO.SuggestedSpells, _Obliterate);
-					_Runes = _Runes - _Obliterate_COST;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _HornofWinter_RDY and _RunicPower <= _RunicPower_Max - 25 and (not tChosen[Ability.BreathofSindragosa.talentID] or (tChosen[Ability.BreathofSindragosa.talentID] and _BreathofSindragosa_CD >= 35)) and ConRO:FullMode(_HornofWinter) then
-					tinsert(ConRO.SuggestedSpells, _HornofWinter);
-					_HornofWinter_RDY = false;
-					_RunicPower = _RunicPower + 25;
-					_Runes = _Runes + 2;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _AbominationLimb_RDY and ConRO:FullMode(_AbominationLimb) then
-					tinsert(ConRO.SuggestedSpells, _AbominationLimb);
-					_AbominationLimb_RDY = false;
-					_Queue = _Queue + 1;
-					break;
-				end
+			if _HowlingBlast_RDY and _Runes >= 1 and not _PillarofFrost_BUFF then
+				tinsert(ConRO.SuggestedSpells, _HowlingBlast)
+				_FrostFever_DEBUFF = true
+				_Runes = _Runes - 1
+				_Queue = _Queue + 1
+				break
 			end
 
 			tinsert(ConRO.SuggestedSpells, 6603); --Waiting Spell Icon
-			_Queue = _Queue + 3;
+			_Queue = _Queue + 3
 			break;
 		end
-	until _Queue >= 3;
-return nil;
+	until _Queue >= 3
+	return nil
 end
 
 function ConRO.DeathKnight.FrostDef(_, timeShift, currentSpell, gcd, tChosen, pvpChosen)
@@ -1128,7 +782,6 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 	ConRO:Stats();
 
 --Abilities
-	local _AbominationLimb, _AbominationLimb_RDY = ConRO:AbilityReady(Ability.AbominationLimb, timeShift);
 	local _Apocalypse, _Apocalypse_RDY, _Apocalypse_CD, _Apocalypse_MaxCD = ConRO:AbilityReady(Ability.Apocalypse, timeShift);
 	local _ArmyoftheDead, _ArmyoftheDead_RDY, _ArmyoftheDead_CD = ConRO:AbilityReady(Ability.ArmyoftheDead, timeShift);
 	local _Asphyxiate, _Asphyxiate_RDY = ConRO:AbilityReady(Ability.Asphyxiate, timeShift);
@@ -1150,6 +803,7 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 	local _FesteringStrike, _FesteringStrike_RDY = ConRO:AbilityReady(Ability.FesteringStrike, timeShift);
 		local _FesteringScythe, _FesteringScythe_RDY = ConRO:AbilityReady(Ability.FesteringScythe, timeShift);
 		local _FesteringWound_DEBUFF, _FesteringWound_COUNT = ConRO:TargetAura(Debuff.FesteringWound, timeShift);
+	local legion_of_souls, legion_of_souls_RDY = ConRO:AbilityReady(Ability.legion_of_souls, timeShift);
 	local _MindFreeze, _MindFreeze_RDY = ConRO:AbilityReady(Ability.MindFreeze, timeShift);
 	local _Outbreak, _Outbreak_RDY = ConRO:AbilityReady(Ability.Outbreak, timeShift);
 		local _VirulentPlague_DEBUFF = ConRO:TargetAura(Debuff.VirulentPlague, timeShift);
@@ -1169,14 +823,18 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 	local _WraithWalk, _WraithWalk_RDY = ConRO:AbilityReady(Ability.WraithWalk, timeShift);
 
 --Conditions
-	local _Ghoul_out = IsSpellKnown(Pet_Ability.Claw, true);
+	local _Ghoul_out = IsSpellKnown(Pet_Ability.Claw, true)
 
 	if tChosen[Ability.Defile.talentID] then
-		_DeathandDecay, _DeathandDecay_RDY = _Defile, _Defile_RDY;
+		_DeathandDecay, _DeathandDecay_RDY = _Defile, _Defile_RDY
+	end
+
+	if tChosen[Ability.legion_of_souls.talentID] then
+		_ArmyoftheDead, _ArmyoftheDead_RDY = legion_of_souls, legion_of_souls_RDY
 	end
 
 	if tChosen[Ability.RaiseDeadUnholy.talentID] then
-		_RaiseDead, _RaiseDead_RDY = _RaiseDeadUnholy, _RaiseDeadUnholy_RDY;
+		_RaiseDead, _RaiseDead_RDY = _RaiseDeadUnholy, _RaiseDeadUnholy_RDY
 	end
 
 --Indicators
@@ -1186,10 +844,9 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 	ConRO:AbilityMovement(_DeathsAdvance, _DeathsAdvance_RDY and not _target_in_melee);
 	ConRO:AbilityMovement(_WraithWalk, _WraithWalk_RDY and not _target_in_melee);
 
-	ConRO:AbilityBurst(_AbominationLimb, _AbominationLimb_RDY and ConRO:BurstMode(_AbominationLimb));
 	ConRO:AbilityBurst(_Apocalypse, _in_combat and _Apocalypse_RDY and _FesteringWound_COUNT >= 4 and ConRO:BurstMode(_Apocalypse));
 	ConRO:AbilityBurst(_ArmyoftheDead, _ArmyoftheDead_RDY and not tChosen[Ability.RaiseAbomination.talentID] and ConRO:BurstMode(_ArmyoftheDead));
-	ConRO:AbilityBurst(_DarkTransformation, _in_combat and _DarkTransformation_RDY and _Ghoul_out and ConRO:BurstMode(_DarkTransformation));
+	ConRO:AbilityBurst(_DarkTransformation, _in_combat and _DarkTransformation_RDY and _Ghoul_out and not tChosen[Ability.Apocalypse.talentID] and ConRO:BurstMode(_DarkTransformation));
 	ConRO:AbilityBurst(_SummonGargoyle, _SummonGargoyle_RDY and _RunicPower >= 90 and _SuddenDoom_BUFF and ConRO:BurstMode(_SummonGargoyle));
 	ConRO:AbilityBurst(_UnholyAssault, _in_combat and _UnholyAssault_RDY and _FesteringWound_COUNT < 3 and ConRO:BurstMode(_UnholyAssault));
 
@@ -1209,7 +866,7 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 					break;
 				end
 
-				if _RaiseAbomination_RDY and ConRO:FullMode(_RaiseAbomination) then
+				if _RaiseAbomination_RDY and tChosen[Ability.RaiseAbomination.talentID] and ConRO:FullMode(_RaiseAbomination) then
 					tinsert(ConRO.SuggestedSpells, _RaiseAbomination);
 					_RaiseAbomination_RDY = false;
 					_Runes = _Runes - 1;
@@ -1257,7 +914,7 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 						break;
 					end
 				elseif _DeathandDecay_BUFF then
-					if _DarkTransformation_RDY and _Ghoul_out and ConRO:HeroSpec(HeroSpec.Sanlayn) and ConRO:FullMode(_DarkTransformation) then
+					if _DarkTransformation_RDY and _Ghoul_out and not tChosen[Ability.Apocalypse.talentID] and ConRO:HeroSpec(HeroSpec.Sanlayn) and ConRO:FullMode(_DarkTransformation) then
 						tinsert(ConRO.SuggestedSpells, _DarkTransformation);
 						_DarkTransformation_RDY = false;
 						_Queue = _Queue + 1;
@@ -1366,17 +1023,10 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 						break;
 					end
 
-					if _RaiseAbomination_RDY and ConRO:FullMode(_RaiseAbomination) then
+					if _RaiseAbomination_RDY and tChosen[Ability.RaiseAbomination.talentID] and ConRO:FullMode(_RaiseAbomination) then
 						tinsert(ConRO.SuggestedSpells, _RaiseAbomination);
 						_RaiseAbomination_RDY = false;
 						_Runes = _Runes - 1;
-						_Queue = _Queue + 1;
-						break;
-					end
-
-					if _AbominationLimb_RDY and ConRO:FullMode(_AbominationLimb) then
-						tinsert(ConRO.SuggestedSpells, _AbominationLimb);
-						_AbominationLimb_RDY = false;
 						_Queue = _Queue + 1;
 						break;
 					end
@@ -1389,7 +1039,7 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 						break;
 					end
 
-					if _DarkTransformation_RDY and _Ghoul_out and ConRO:FullMode(_DarkTransformation) then
+					if _DarkTransformation_RDY and _Ghoul_out and not tChosen[Ability.Apocalypse.talentID] and ConRO:FullMode(_DarkTransformation) then
 						tinsert(ConRO.SuggestedSpells, _DarkTransformation);
 						_DarkTransformation_RDY = false;
 						_Queue = _Queue + 1;
@@ -1488,17 +1138,10 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 						break;
 					end
 
-					if _RaiseAbomination_RDY and ConRO:FullMode(_RaiseAbomination) then
+					if _RaiseAbomination_RDY and tChosen[Ability.RaiseAbomination.talentID] and ConRO:FullMode(_RaiseAbomination) then
 						tinsert(ConRO.SuggestedSpells, _RaiseAbomination);
 						_RaiseAbomination_RDY = false;
 						_Runes = _Runes - 1;
-						_Queue = _Queue + 1;
-						break;
-					end
-
-					if _AbominationLimb_RDY and ConRO:FullMode(_AbominationLimb) then
-						tinsert(ConRO.SuggestedSpells, _AbominationLimb);
-						_AbominationLimb_RDY = false;
 						_Queue = _Queue + 1;
 						break;
 					end
@@ -1529,7 +1172,7 @@ function ConRO.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, tChosen, pvpC
 						end
 					end
 
-					if _DarkTransformation_RDY and _Ghoul_out and ConRO:FullMode(_DarkTransformation) then
+					if _DarkTransformation_RDY and _Ghoul_out and not tChosen[Ability.Apocalypse.talentID] and ConRO:FullMode(_DarkTransformation) then
 						tinsert(ConRO.SuggestedSpells, _DarkTransformation);
 						_DarkTransformation_RDY = false;
 						_Queue = _Queue + 1;
