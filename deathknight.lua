@@ -533,7 +533,7 @@ function ConRO.DeathKnight.Frost(_, timeShift, currentSpell, gcd, tChosen, pvpCh
 		local _PillarofFrost_BUFF, _, _PillarofFrost_DUR = ConRO:Aura(Buff.PillarofFrost, timeShift);
 		local _PillarofFrost_THRESHOLD = 45;
 	local _RaiseDead, _RaiseDead_RDY = ConRO:AbilityReady(Ability.RaiseDead, timeShift);
-	local _ReapersMark, _ReapersMark_RDY = ConRO:AbilityReady(Ability.ReapersMark, timeShift);
+	local _ReapersMark, _ReapersMark_RDY, _ReapersMark_CD = ConRO:AbilityReady(Ability.ReapersMark, timeShift);
 	local _RemorselessWinter, _RemorselessWinter_RDY = ConRO:AbilityReady(Ability.RemorselessWinter, timeShift);
 	local _WraithWalk, _WraithWalk_RDY = ConRO:AbilityReady(Ability.WraithWalk, timeShift);
 
